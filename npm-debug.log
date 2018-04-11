@@ -1,0 +1,197 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'erlpack@hammerandchisel/erlpack@latest',
+1 verbose cli   'sodium@latest',
+1 verbose cli   'libsodium-wrappers@latest',
+1 verbose cli   'uws@latest',
+1 verbose cli   '--save' ]
+2 info using npm@3.10.10
+3 info using node@v6.11.3
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData erlpack@hammerandchisel/erlpack@latest
+8 silly fetchPackageMetaData sodium@latest
+9 silly fetchPackageMetaData libsodium-wrappers@latest
+10 silly fetchPackageMetaData uws@latest
+11 silly fetchOtherPackageData erlpack@hammerandchisel/erlpack@latest
+12 silly cache add args [ 'erlpack@hammerandchisel/erlpack@latest', null ]
+13 verbose cache add spec erlpack@hammerandchisel/erlpack@latest
+14 silly fetchNamedPackageData sodium
+15 silly mapToRegistry name sodium
+16 silly mapToRegistry using default registry
+17 silly mapToRegistry registry https://registry.npmjs.org/
+18 silly mapToRegistry data Result {
+18 silly mapToRegistry   raw: 'sodium',
+18 silly mapToRegistry   scope: null,
+18 silly mapToRegistry   escapedName: 'sodium',
+18 silly mapToRegistry   name: 'sodium',
+18 silly mapToRegistry   rawSpec: '',
+18 silly mapToRegistry   spec: 'latest',
+18 silly mapToRegistry   type: 'tag' }
+19 silly mapToRegistry uri https://registry.npmjs.org/sodium
+20 silly fetchNamedPackageData libsodium-wrappers
+21 silly mapToRegistry name libsodium-wrappers
+22 silly mapToRegistry using default registry
+23 silly mapToRegistry registry https://registry.npmjs.org/
+24 silly mapToRegistry data Result {
+24 silly mapToRegistry   raw: 'libsodium-wrappers',
+24 silly mapToRegistry   scope: null,
+24 silly mapToRegistry   escapedName: 'libsodium-wrappers',
+24 silly mapToRegistry   name: 'libsodium-wrappers',
+24 silly mapToRegistry   rawSpec: '',
+24 silly mapToRegistry   spec: 'latest',
+24 silly mapToRegistry   type: 'tag' }
+25 silly mapToRegistry uri https://registry.npmjs.org/libsodium-wrappers
+26 silly fetchNamedPackageData uws
+27 silly mapToRegistry name uws
+28 silly mapToRegistry using default registry
+29 silly mapToRegistry registry https://registry.npmjs.org/
+30 silly mapToRegistry data Result {
+30 silly mapToRegistry   raw: 'uws',
+30 silly mapToRegistry   scope: null,
+30 silly mapToRegistry   escapedName: 'uws',
+30 silly mapToRegistry   name: 'uws',
+30 silly mapToRegistry   rawSpec: '',
+30 silly mapToRegistry   spec: 'latest',
+30 silly mapToRegistry   type: 'tag' }
+31 silly mapToRegistry uri https://registry.npmjs.org/uws
+32 silly cache add parsed spec Result {
+32 silly cache add   raw: 'erlpack@hammerandchisel/erlpack@latest',
+32 silly cache add   scope: null,
+32 silly cache add   escapedName: 'erlpack',
+32 silly cache add   name: 'erlpack',
+32 silly cache add   rawSpec: 'hammerandchisel/erlpack@latest',
+32 silly cache add   spec: '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest',
+32 silly cache add   type: 'local' }
+33 error addLocal Could not install /Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest
+34 silly fetchPackageMetaData Error: ENOENT: no such file or directory, open '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest'
+34 silly fetchPackageMetaData     at Error (native)
+34 silly fetchPackageMetaData  error for erlpack@hammerandchisel/erlpack@latest { Error: ENOENT: no such file or directory, open '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest'
+34 silly fetchPackageMetaData     at Error (native)
+34 silly fetchPackageMetaData   errno: -2,
+34 silly fetchPackageMetaData   code: 'ENOENT',
+34 silly fetchPackageMetaData   syscall: 'open',
+34 silly fetchPackageMetaData   path: '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest' }
+35 verbose request uri https://registry.npmjs.org/sodium
+36 verbose request no auth needed
+37 info attempt registry request try #1 at 5:03:14 PM
+38 verbose request id 6e5ce2a84f3313f9
+39 verbose etag "5a150b65-e3e8"
+40 verbose lastModified Wed, 22 Nov 2017 5:30:13 GMT
+41 http request GET https://registry.npmjs.org/sodium
+42 verbose request uri https://registry.npmjs.org/uws
+43 verbose request no auth needed
+44 info attempt registry request try #1 at 5:03:14 PM
+45 verbose etag "5a27f396-3340"
+46 verbose lastModified Wed, 6 Dec 2017 13:41:42 GMT
+47 http request GET https://registry.npmjs.org/uws
+48 verbose request uri https://registry.npmjs.org/libsodium-wrappers
+49 verbose request no auth needed
+50 info attempt registry request try #1 at 5:03:14 PM
+51 verbose etag "5a418441-b35b"
+52 verbose lastModified Mon, 25 Dec 2017 23:05:37 GMT
+53 http request GET https://registry.npmjs.org/libsodium-wrappers
+54 http 304 https://registry.npmjs.org/sodium
+55 verbose headers { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+55 verbose headers   via: '1.1 varnish',
+55 verbose headers   'cache-control': 'max-age=300',
+55 verbose headers   etag: '"5a150b65-e3e8"',
+55 verbose headers   age: '16',
+55 verbose headers   connection: 'keep-alive',
+55 verbose headers   'x-served-by': 'cache-ams4426-AMS',
+55 verbose headers   'x-cache': 'HIT',
+55 verbose headers   'x-cache-hits': '1',
+55 verbose headers   'x-timer': 'S1514476994.248349,VS0,VE1',
+55 verbose headers   vary: 'Accept-Encoding, Accept' }
+56 silly get cb [ 304,
+56 silly get   { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+56 silly get     via: '1.1 varnish',
+56 silly get     'cache-control': 'max-age=300',
+56 silly get     etag: '"5a150b65-e3e8"',
+56 silly get     age: '16',
+56 silly get     connection: 'keep-alive',
+56 silly get     'x-served-by': 'cache-ams4426-AMS',
+56 silly get     'x-cache': 'HIT',
+56 silly get     'x-cache-hits': '1',
+56 silly get     'x-timer': 'S1514476994.248349,VS0,VE1',
+56 silly get     vary: 'Accept-Encoding, Accept' } ]
+57 verbose etag https://registry.npmjs.org/sodium from cache
+58 verbose get saving sodium to /Users/ivodebruijn/.npm/registry.npmjs.org/sodium/.cache.json
+59 verbose correctMkdir /Users/ivodebruijn/.npm correctMkdir not in flight; initializing
+60 http 304 https://registry.npmjs.org/libsodium-wrappers
+61 verbose headers { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+61 verbose headers   via: '1.1 varnish',
+61 verbose headers   'cache-control': 'max-age=300',
+61 verbose headers   etag: '"5a418441-b35b"',
+61 verbose headers   age: '8973',
+61 verbose headers   connection: 'keep-alive',
+61 verbose headers   'x-served-by': 'cache-ams4135-AMS',
+61 verbose headers   'x-cache': 'HIT',
+61 verbose headers   'x-cache-hits': '1',
+61 verbose headers   'x-timer': 'S1514476994.250597,VS0,VE0',
+61 verbose headers   vary: 'Accept-Encoding, Accept' }
+62 silly get cb [ 304,
+62 silly get   { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+62 silly get     via: '1.1 varnish',
+62 silly get     'cache-control': 'max-age=300',
+62 silly get     etag: '"5a418441-b35b"',
+62 silly get     age: '8973',
+62 silly get     connection: 'keep-alive',
+62 silly get     'x-served-by': 'cache-ams4135-AMS',
+62 silly get     'x-cache': 'HIT',
+62 silly get     'x-cache-hits': '1',
+62 silly get     'x-timer': 'S1514476994.250597,VS0,VE0',
+62 silly get     vary: 'Accept-Encoding, Accept' } ]
+63 verbose etag https://registry.npmjs.org/libsodium-wrappers from cache
+64 verbose get saving libsodium-wrappers to /Users/ivodebruijn/.npm/registry.npmjs.org/libsodium-wrappers/.cache.json
+65 verbose correctMkdir /Users/ivodebruijn/.npm correctMkdir already in flight; waiting
+66 http 304 https://registry.npmjs.org/uws
+67 verbose headers { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+67 verbose headers   via: '1.1 varnish',
+67 verbose headers   'cache-control': 'max-age=300',
+67 verbose headers   etag: '"5a27f396-3340"',
+67 verbose headers   age: '6990',
+67 verbose headers   connection: 'keep-alive',
+67 verbose headers   'x-served-by': 'cache-ams4126-AMS',
+67 verbose headers   'x-cache': 'HIT',
+67 verbose headers   'x-cache-hits': '5',
+67 verbose headers   'x-timer': 'S1514476994.254855,VS0,VE0',
+67 verbose headers   vary: 'Accept-Encoding, Accept' }
+68 silly get cb [ 304,
+68 silly get   { date: 'Thu, 28 Dec 2017 16:03:14 GMT',
+68 silly get     via: '1.1 varnish',
+68 silly get     'cache-control': 'max-age=300',
+68 silly get     etag: '"5a27f396-3340"',
+68 silly get     age: '6990',
+68 silly get     connection: 'keep-alive',
+68 silly get     'x-served-by': 'cache-ams4126-AMS',
+68 silly get     'x-cache': 'HIT',
+68 silly get     'x-cache-hits': '5',
+68 silly get     'x-timer': 'S1514476994.254855,VS0,VE0',
+68 silly get     vary: 'Accept-Encoding, Accept' } ]
+69 verbose etag https://registry.npmjs.org/uws from cache
+70 verbose get saving uws to /Users/ivodebruijn/.npm/registry.npmjs.org/uws/.cache.json
+71 verbose correctMkdir /Users/ivodebruijn/.npm correctMkdir already in flight; waiting
+72 silly rollbackFailedOptional Starting
+73 silly rollbackFailedOptional Finishing
+74 silly runTopLevelLifecycles Finishing
+75 silly install printInstalled
+76 verbose stack Error: ENOENT: no such file or directory, open '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest'
+76 verbose stack     at Error (native)
+77 verbose cwd /Users/ivodebruijn/Development/Bumblebee/discord
+78 error Darwin 17.3.0
+79 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install" "erlpack@hammerandchisel/erlpack@latest" "sodium@latest" "libsodium-wrappers@latest" "uws@latest" "--save"
+80 error node v6.11.3
+81 error npm  v3.10.10
+82 error path /Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest
+83 error code ENOENT
+84 error errno -2
+85 error syscall open
+86 error enoent ENOENT: no such file or directory, open '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest'
+87 error enoent ENOENT: no such file or directory, open '/Users/ivodebruijn/Development/Bumblebee/discord/hammerandchisel/erlpack@latest'
+87 error enoent This is most likely not a problem with npm itself
+87 error enoent and is related to npm not being able to find a file.
+88 verbose exit [ -2, true ]
