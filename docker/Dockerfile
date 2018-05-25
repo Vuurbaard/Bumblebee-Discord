@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:8
 ARG NPM_INSTALL_BEFORE=true
 RUN mkdir -p /var/www/html
 RUN npm install -g nodemon
