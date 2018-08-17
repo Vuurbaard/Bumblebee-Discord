@@ -1,7 +1,6 @@
-FROM node:latest
+FROM node:8
 ARG NPM_INSTALL_BEFORE=true
 RUN mkdir -p /var/www/html
-RUN yarn global add ffmpeg-binaries
 RUN npm install -g nodemon
 
 COPY ./package.json /tmp/package.json
@@ -16,6 +15,17 @@ RUN if [ $NPM_INSTALL_BEFORE = "true" ]; then \
     npm install && \
     mkdir -p /var/www/html && cp -a /tmp/node_modules /var/www/html ; \
     fi
+
+RUN sed -i "s/jessie main/jessie main contrib non-free/" /etc/apt/sources.list
+RUN echo "deb http://http.debian.net/debian jessie-backports main contrib non-free" >> /etc/apt/sources.list
+RUN apt-get update && apt-get install -y \
+    ffmpeg
+
+RUN apt-get install -y locales && \
+    locale-gen C.UTF-8 && \
+    /usr/sbin/update-locale LANG=C.UTF-8
+
+ENV LC_ALL C.UTF-8
 
 RUN chmod +x /var/www/start.sh
 CMD bash /var/www/start.sh 
