@@ -9,7 +9,7 @@ const request = require('request');
 const fs = require('fs');
 const Queuer = require('./queuer');
 const randomstring = require('randomstring');
-
+ 
 let authToken = "";
 let queues = [];
 
@@ -22,11 +22,12 @@ client.on('ready', () => {
 
 client.on('message', message => {
 
+	var me = this;
 	console.log("Discord message:", message.content);
 
 	if (message.channel.name != "bumblebee") { return; }
-	if (!message.member) { return; }
 	if (!message.member.voiceChannel) { return; }
+	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
 
 	createOrUpdateUser(message);
@@ -45,7 +46,7 @@ client.on('message', message => {
 	queue.push(function (queuer) {
 		message.member.voiceChannel.join().then(connection => {
 			var options = {
-				url: 'http://' + api() + '/tts',
+				url: 'http://' + api() + '/v1/tts',
 				body: { "text": message.content },
 				json: true,
 				headers: { 'Authorization': this.authToken }
@@ -97,13 +98,18 @@ client.on('message', message => {
 						console.log(info)
 					});
 
-					if (body.wordsNotFound && body.wordsNotFound.length > 0) {
-						message.reply('Missing words: ' + body.wordsNotFound);
+					if (body.fragments && body.fragments.length > 0) {
+						let missingWords = body.fragments.filter(val => { return (typeof (val) == "string") });
+						message.reply('Missing words: ' + missingWords);
+					}
+				}
+				else if (body.fragments && body.fragments.length > 0) {
+
+					if (body.fragments && body.fragments.length > 0) {
+						let missingWords = body.fragments.filter(val => { return (typeof (val) == "string") });
+						message.reply('Missing words: ' + missingWords);
 					}
 
-				}
-				else if (body.wordsNotFound && body.wordsNotFound.length > 0) {
-					message.reply('Missing words: ' + body.wordsNotFound);
 					queuer.finish();
 				}
 				else {
@@ -139,18 +145,20 @@ function token() {
 function login() {
 	console.log('Ready!');
 
+	var me = this;
+
 	var options = {
-		url: 'http://' + api() + '/login',
-		body: { "username": "Bumblebee", "password": "123" },
+		url: 'http://' + api() + '/v1/login',
+		body: { "username": process.env.API_USERNAME, "password": process.env.API_PASSWORD },
 		json: true
 	};
 
 	console.log('Trying to authenticate with Bumblebee API...');
 	request.post(options, function (error, response, body) {
 		if (body) {
-			if (body.success) {
+			if (body.token) {				
+				me.authToken = body.token;
 				console.log('Authenticated!');
-				this.authToken = body.token;
 			}
 			else {
 				console.log(body);
@@ -168,9 +176,9 @@ function login() {
 	});
 }
 
-function shutdown(data){
+function shutdown(data) {
 	console.log("Exit with code:" + data);
-	client.voiceConnections.forEach(function(connection,key){
+	client.voiceConnections.forEach(function (connection, key) {
 		// Disconnect
 		console.log("Disconnecting from: " + connection.channel.name);
 		connection.disconnect();
@@ -194,14 +202,12 @@ process.on('SIGUSR1', shutdown.bind());
 process.once('SIGUSR2', shutdown.bind());
 
 function createOrUpdateUser(message) {
+
 	let username = message.member.user.username + "#" + message.member.user.discriminator;
-	let password = randomstring.generate({
-		length: 12,
-		charset: 'alphabetic'
-	});
+	let password = randomstring.generate({ length: 12, charset: 'alphabetic' });
 
 	var options = {
-		url: 'http://' + api() + '/users',
+		url: 'http://' + api() + '/v1/register',
 		body: {
 			"externalId": message.member.user.id,
 			"name": message.member.user.username,
@@ -213,18 +219,26 @@ function createOrUpdateUser(message) {
 		headers: { 'Authorization': this.authToken }
 	};
 
+	console.log('Trying to create new user...');
+	console.log(options);
+
 	request.post(options, function (error, response, body) {
-		if (body && body.success && body.created) {
-			console.log('Created or updated user', username);
+
+		if (error) {
+			console.log(error)
+		}
+
+		if (body && body.success) {
+			console.log('Registered user', username);
 
 			let embed = new Discord.RichEmbed();
 			embed.setDescription("For your convenience I've created an account for you so you can add your own audio to my database.");
 			embed.setAuthor("Bumblebee", "https://www.dropbox.com/s/jl9h68lfk92j3q4/bumblee%20icon.png?dl=1", "https://bumblebee.fm");
 			embed.setTitle("https://bumblebee.fm");
-			embed.setURL("https://bumblebee.fm/login");
+			embed.setURL("https://bumblebee.fm/login?username=" + username);
 			embed.setFooter('Navigate to the URL above to get started');
 			embed.setColor("#f6a821");
-		
+
 			embed.fields.push({ name: 'username', value: username });
 			embed.fields.push({ name: 'password', value: password });
 			message.member.send(embed);
