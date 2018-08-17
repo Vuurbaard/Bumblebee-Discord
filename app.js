@@ -99,14 +99,14 @@ client.on('message', message => {
 					});
 
 					if (body.fragments && body.fragments.length > 0) {
-						let missingWords = body.fragments.filter(val => { return (typeof (val) == "string") });
+						let missingWords = body.fragments.filter(val => { return !val._id });
 						message.reply('Missing words: ' + missingWords);
 					}
 				}
 				else if (body.fragments && body.fragments.length > 0) {
 
 					if (body.fragments && body.fragments.length > 0) {
-						let missingWords = body.fragments.filter(val => { return (typeof (val) == "string") });
+						let missingWords = body.fragments.filter(val => { return !val._id });
 						message.reply('Missing words: ' + missingWords);
 					}
 
