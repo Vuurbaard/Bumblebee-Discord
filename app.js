@@ -9,7 +9,7 @@ const request = require('request');
 const fs = require('fs');
 const Queuer = require('./queuer');
 const randomstring = require('randomstring');
- 
+
 let authToken = "";
 let queues = [];
 
@@ -53,6 +53,21 @@ client.on('message', message => {
 			};
 
 			request.post(options, function (error, response, body) {
+
+				if (body.fragments && body.fragments.length > 0) {
+
+					let missingWords = body.fragments.filter(fragment => {
+						if (fragment._id) {
+							return false;
+						}
+						return true;
+					}).map(fragment => { return " " + fragment.text });
+
+					if (missingWords && missingWords.length > 0) {
+						message.reply('Missing words:' + missingWords);
+					}
+				}
+
 				if (body && body.file) {
 
 					// let filepath = __dirname + '/../api' + body.file;
@@ -97,20 +112,6 @@ client.on('message', message => {
 					dispatcher.on('debug', function (info) {
 						console.log(info)
 					});
-
-					if (body.fragments && body.fragments.length > 0) {
-						let missingWords = body.fragments.filter(val => { return !val._id });
-						message.reply('Missing words: ' + missingWords);
-					}
-				}
-				else if (body.fragments && body.fragments.length > 0) {
-
-					if (body.fragments && body.fragments.length > 0) {
-						let missingWords = body.fragments.filter(val => { return !val._id });
-						message.reply('Missing words: ' + missingWords);
-					}
-
-					queuer.finish();
 				}
 				else {
 					console.error("Something went wrong doing the API request", error, body);
@@ -156,7 +157,7 @@ function login() {
 	console.log('Trying to authenticate with Bumblebee API...');
 	request.post(options, function (error, response, body) {
 		if (body) {
-			if (body.token) {				
+			if (body.token) {
 				me.authToken = body.token;
 				console.log('Authenticated!');
 			}
