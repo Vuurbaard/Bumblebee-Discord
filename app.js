@@ -30,7 +30,7 @@ client.on('message', message => {
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
 
-	createOrUpdateUser(message);
+	// createOrUpdateUser(message);
 
 	// Generate unique name for the queue we are going to use
 	// Readable + unique
@@ -202,47 +202,47 @@ process.on('SIGINT', shutdown.bind());
 process.on('SIGUSR1', shutdown.bind());
 process.once('SIGUSR2', shutdown.bind());
 
-function createOrUpdateUser(message) {
+// function createOrUpdateUser(message) {
 
-	let username = message.member.user.username + "#" + message.member.user.discriminator;
-	let password = randomstring.generate({ length: 12, charset: 'alphabetic' });
+// 	let username = message.member.user.username + "#" + message.member.user.discriminator;
+// 	let password = randomstring.generate({ length: 12, charset: 'alphabetic' });
 
-	var options = {
-		url: 'http://' + api() + '/v1/register',
-		body: {
-			"externalId": message.member.user.id,
-			"name": message.member.user.username,
-			"username": username,
-			"password": password,
-			"avatar": message.member.user.avatarURL,
-		},
-		json: true,
-		headers: { 'Authorization': this.authToken }
-	};
+// 	var options = {
+// 		url: 'http://' + api() + '/v1/register',
+// 		body: {
+// 			"externalId": message.member.user.id,
+// 			"name": message.member.user.username,
+// 			"username": username,
+// 			"password": password,
+// 			"avatar": message.member.user.avatarURL,
+// 		},
+// 		json: true,
+// 		headers: { 'Authorization': this.authToken }
+// 	};
 
-	console.log('Trying to create new user...');
-	console.log(options);
+// 	console.log('Trying to create new user...');
+// 	console.log(options);
 
-	request.post(options, function (error, response, body) {
+// 	request.post(options, function (error, response, body) {
 
-		if (error) {
-			console.log(error)
-		}
+// 		if (error) {
+// 			console.log(error)
+// 		}
 
-		if (body && body.success) {
-			console.log('Registered user', username);
+// 		if (body && body.success) {
+// 			console.log('Registered user', username);
 
-			let embed = new Discord.RichEmbed();
-			embed.setDescription("For your convenience I've created an account for you so you can add your own audio to my database.");
-			embed.setAuthor("Bumblebee", "https://www.dropbox.com/s/jl9h68lfk92j3q4/bumblee%20icon.png?dl=1", "https://bumblebee.fm");
-			embed.setTitle("https://bumblebee.fm");
-			embed.setURL("https://bumblebee.fm/login?username=" + username);
-			embed.setFooter('Navigate to the URL above to get started');
-			embed.setColor("#f6a821");
+// 			let embed = new Discord.RichEmbed();
+// 			embed.setDescription("For your convenience I've created an account for you so you can add your own audio to my database.");
+// 			embed.setAuthor("Bumblebee", "https://www.dropbox.com/s/jl9h68lfk92j3q4/bumblee%20icon.png?dl=1", "https://bumblebee.fm");
+// 			embed.setTitle("https://bumblebee.fm");
+// 			embed.setURL("https://bumblebee.fm/login?username=" + username);
+// 			embed.setFooter('Navigate to the URL above to get started');
+// 			embed.setColor("#f6a821");
 
-			embed.fields.push({ name: 'username', value: username });
-			embed.fields.push({ name: 'password', value: password });
-			message.member.send(embed);
-		}
-	});
-}
+// 			embed.fields.push({ name: 'username', value: username });
+// 			embed.fields.push({ name: 'password', value: password });
+// 			message.member.send(embed);
+// 		}
+// 	});
+// }
