@@ -1,10 +1,15 @@
-FROM node:8-alpine
-WORKDIR /var/www/html
-RUN apk add ffmpeg
-ENV LC_ALL C.UTF-8
+FROM node:10 as builder
 ENV NODE_ENV production
-
+WORKDIR /var/www/html
+RUN mkdir -p /var/www/html
 COPY ./ /var/www/html
-
+RUN mkdir -p /var/www/html/tmp
 RUN npm install --production
-CMD node /var/www/html/app.js
+
+
+FROM node:10-alpine
+ENV NODE_ENV production
+WORKDIR /var/www/html
+RUN mkdir -p /var/www/html/tmp
+COPY --from=builder /var/www/html /var/www/html
+CMD node ./app.js
