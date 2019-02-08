@@ -16,7 +16,7 @@ let queues = [];
 client.on('ready', () => {
 	// Try to login
 	login();
-	client.user.setPresence({ game: { name: 'api.bmbl.mijnproject.nu', type: 2 } }).then(console.log).catch(console.error);
+	client.user.setPresence({ game: { name: 'bmbl.mijnproject.nu', type: 2 } }).then(console.log).catch(console.error);
 
 });
 
