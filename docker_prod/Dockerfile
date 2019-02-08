@@ -1,4 +1,4 @@
-FROM node:10 as builder
+FROM node:8 as builder
 ENV NODE_ENV production
 WORKDIR /var/www/html
 RUN mkdir -p /var/www/html
@@ -7,7 +7,7 @@ RUN mkdir -p /var/www/html/tmp
 RUN npm install --production
 
 
-FROM node:10-alpine
+FROM node:8-alpine
 ENV NODE_ENV production
 RUN apk add ffmpeg
 WORKDIR /var/www/html
