@@ -9,14 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/uws": "^10.149.0",
     "bufferutil": "^3.0.5",
-    "discord.js": "^11.3.2",
-    "dotenv": "^5.0.1",
-    "node-opus": "~0.3.0",
-    "opusscript": "0.0.6",
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.1.0",
+    "node-opus": "^0.3.2",
+    "opusscript": "0.0.7",
     "randomstring": "^1.1.5",
-    "request": "^2.87.0",
-    "zlib-sync": "^0.1.4"
+    "request": "^2.88.0",
+    "zlib-sync": "^0.1.5"
   },
   "devDependencies": {}
 }

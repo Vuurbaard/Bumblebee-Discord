@@ -30,6 +30,18 @@ client.on('message', message => {
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
 
+	if(message.content === '!disconnect'){
+		try{
+			var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
+			if(channel != null){
+				channel.disconnect();
+				return;
+			}
+			//client.leaveVoiceChannel(message.member.voiceState.channelId);
+		}catch(e){
+			console.log(e);
+		}
+	}
 	// createOrUpdateUser(message);
 
 	// Generate unique name for the queue we are going to use
@@ -53,7 +65,7 @@ client.on('message', message => {
 			};
 
 			request.post(options, function (error, response, body) {
-
+				console.log(error);
 				if (body.fragments && body.fragments.length > 0) {
 
 					let missingWords = body.fragments.filter(fragment => {
@@ -184,7 +196,6 @@ function shutdown(data) {
 		console.log("Disconnecting from: " + connection.channel.name);
 		connection.disconnect();
 	});
-
 	client.destroy();
 	// Don't change this, otherwise nodemon will freak the fuck out :OOOOO
 	process.kill(process.pid, data);
