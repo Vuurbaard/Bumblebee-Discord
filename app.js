@@ -3,6 +3,10 @@
 // Read ENV file
 require('dotenv').config();
 
+const log4js = require('log4js');
+var logger = log4js.getLogger();
+logger.level = process.env.LOG_LEVEL;
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const request = require('request');
@@ -12,24 +16,27 @@ const randomstring = require('randomstring');
 
 let authToken = "";
 let queues = [];
+let timers = {};
+
+const timeout = 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
 
 client.on('ready', () => {
 	// Try to login
 	login();
-	client.user.setPresence({ game: { name: 'bmbl.mijnproject.nu', type: 2 } }).then(console.log).catch(console.error);
-
+	client.user.setPresence({ game: { name: 'bmbl.mijnproject.nu', type: 2 } }).then((data) => { logger.debug(data)}).catch(console.error);
 });
 
 client.on('message', message => {
 
 	var me = this;
-	console.log("Discord message:", message.content);
+	logger.info("💬 " + message.author.username + ": " + message.content);
 
 	if (message.channel.name != "bumblebee") { return; }
 	if (!message.member.voiceChannel) { return; }
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
 
+	// 
 	if(message.content === '!disconnect'){
 		try{
 			var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
@@ -37,12 +44,11 @@ client.on('message', message => {
 				channel.disconnect();
 				return;
 			}
-			//client.leaveVoiceChannel(message.member.voiceState.channelId);
 		}catch(e){
-			console.log(e);
+			logger.warn("Failed to disconnect due to");
+			logger.warn(e.message);
 		}
 	}
-	// createOrUpdateUser(message);
 
 	// Generate unique name for the queue we are going to use
 	// Readable + unique
@@ -52,6 +58,23 @@ client.on('message', message => {
 		queues[queueName] = new Queuer();
 	}
 
+	// Use the queue name for timeout purposes
+	if(timers[queueName] != null){
+		logger.debug("⏰ Clearing timer for " + queueName);
+		clearTimeout(timers[queueName]);
+	}
+
+	// Set new timeout
+	timers[queueName] = setTimeout(() => {
+		logger.info("👋 Leaving voice channel in guild " . message.member.guild.name );
+		message.channel.send('👋 Leaving voice channel due to inactivity')
+		var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
+		if(channel != null){
+			channel.disconnect();
+			return;
+		}
+	}, timeout);
+
 	// Current queue for guild (aka server)
 	var queue = queues[queueName];
 
@@ -59,13 +82,12 @@ client.on('message', message => {
 		message.member.voiceChannel.join().then(connection => {
 			var options = {
 				url: 'http://' + api() + '/v1/tts',
-				body: { "text": message.content },
+				body: { "text" : message.content },
 				json: true,
 				headers: { 'Authorization': this.authToken }
 			};
 
 			request.post(options, function (error, response, body) {
-				console.log(error);
 				if (body.fragments && body.fragments.length > 0) {
 
 					let missingWords = body.fragments.filter(fragment => {
@@ -84,12 +106,11 @@ client.on('message', message => {
 
 					// let filepath = __dirname + '/../api' + body.file;
 					let filepath = 'http://' + api() + body.file;
-
-					console.log('Playing file:', filepath);
+					logger.info("📣 Playing file: " + filepath);
 
 					const dispatcher = connection.playStream(filepath, function (err, intent) {
-						console.log('err:', err);
-						console.log('intent:', intent);
+						logger.warn('🚨 error: ' + err.message);
+						logger.debug('ℹ️ intent: ' + intent.message);
 					});
 
 					dispatcher.on('start', function () {
@@ -104,11 +125,11 @@ client.on('message', message => {
 						};
 						request.delete(options, function (error, response, body) {
 							if (error || response && response.statusCode != 200) {
-								console.log(error, response.statusCode, body);
-								console.log('failed to delete', options.url);
+								logger.debug(error);
+								logger.warn('🚨 failed to delete ' + options.url);
 							}
 							else {
-								console.log('deleted audio at', options.url);
+								logger.info("🗑 deleted audio at " + options.url);
 							}
 
 						});
@@ -117,12 +138,13 @@ client.on('message', message => {
 					});
 
 					dispatcher.on('error', function (reason) {
-						console.log('Dispatcher error ', reason)
+						logger.warn('🚨 Dispatcher error: ' + reason.message);
+						logger.debug('ℹ️ Clearing queuer');
 						queuer.finish();
 					});
 
 					dispatcher.on('debug', function (info) {
-						console.log(info)
+						logger.debug(info);
 					});
 				}
 				else {
@@ -132,7 +154,7 @@ client.on('message', message => {
 			});
 
 		}).catch(function (err) {
-			console.log(err);
+			logger.warn(err);
 			queuer.finish()
 		});
 	});
@@ -142,7 +164,7 @@ client.on('message', message => {
 });
 
 client.on('debug', info => {
-	console.log(info);
+	logger.debug(info);
 });
 
 client.login(token());
@@ -156,7 +178,7 @@ function token() {
 }
 
 function login() {
-	console.log('Ready!');
+	logger.info('Ready to rollout');
 
 	var me = this;
 
@@ -165,24 +187,22 @@ function login() {
 		body: { "username": process.env.API_USERNAME, "password": process.env.API_PASSWORD },
 		json: true
 	};
-
-	console.log('Trying to authenticate with Bumblebee API...');
+	logger.info('❕ Establishing connection with Bumblebee API @ ' + api());
 	request.post(options, function (error, response, body) {
 		if (body) {
 			if (body.token) {
 				me.authToken = body.token;
-				console.log('Authenticated!');
+				logger.info('🔓 Authenticated');
 			}
 			else {
-				console.log(body);
-				console.log(body.error);
+				logger.warn('🔐 Authentication failed: ' + body.error);
 			}
 		}
 		else {
 			// Seems like the API is down?
-			console.error("Cannot connect to the API", options);
+			logger.warn('🚨 Cannot connect to api', options)
 			setTimeout(() => {
-				console.log("Retrying...");
+				logger.info('Trying to log back in again');
 				login();
 			}, 5000)
 		}
@@ -212,48 +232,3 @@ process.on('SIGINT', shutdown.bind());
 // // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', shutdown.bind());
 process.once('SIGUSR2', shutdown.bind());
-
-// function createOrUpdateUser(message) {
-
-// 	let username = message.member.user.username + "#" + message.member.user.discriminator;
-// 	let password = randomstring.generate({ length: 12, charset: 'alphabetic' });
-
-// 	var options = {
-// 		url: 'http://' + api() + '/v1/register',
-// 		body: {
-// 			"externalId": message.member.user.id,
-// 			"name": message.member.user.username,
-// 			"username": username,
-// 			"password": password,
-// 			"avatar": message.member.user.avatarURL,
-// 		},
-// 		json: true,
-// 		headers: { 'Authorization': this.authToken }
-// 	};
-
-// 	console.log('Trying to create new user...');
-// 	console.log(options);
-
-// 	request.post(options, function (error, response, body) {
-
-// 		if (error) {
-// 			console.log(error)
-// 		}
-
-// 		if (body && body.success) {
-// 			console.log('Registered user', username);
-
-// 			let embed = new Discord.RichEmbed();
-// 			embed.setDescription("For your convenience I've created an account for you so you can add your own audio to my database.");
-// 			embed.setAuthor("Bumblebee", "https://www.dropbox.com/s/jl9h68lfk92j3q4/bumblee%20icon.png?dl=1", "https://bumblebee.fm");
-// 			embed.setTitle("https://bumblebee.fm");
-// 			embed.setURL("https://bumblebee.fm/login?username=" + username);
-// 			embed.setFooter('Navigate to the URL above to get started');
-// 			embed.setColor("#f6a821");
-
-// 			embed.fields.push({ name: 'username', value: username });
-// 			embed.fields.push({ name: 'password', value: password });
-// 			message.member.send(embed);
-// 		}
-// 	});
-// }
