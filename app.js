@@ -29,12 +29,15 @@ client.on('ready', () => {
 client.on('message', message => {
 
 	var me = this;
-	logger.info("💬 " + message.author.username + ": " + message.content);
+	
 
 	if (message.channel.name != "bumblebee") { return; }
 	if (!message.member.voiceChannel) { return; }
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
+
+	// Only log in the bumblebee channel
+	logger.info("💬 " + message.author.username + ": " + message.content);
 
 	// 
 	if(message.content === '!disconnect'){
