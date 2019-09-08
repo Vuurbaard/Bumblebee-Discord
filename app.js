@@ -12,7 +12,6 @@ const client = new Discord.Client();
 const request = require('request');
 const fs = require('fs');
 const Queuer = require('./queuer');
-const randomstring = require('randomstring');
 
 let authToken = "";
 let queues = [];
