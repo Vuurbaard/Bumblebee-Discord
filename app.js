@@ -68,10 +68,12 @@ client.on('message', message => {
 
 	// Set new timeout
 	timers[queueName] = setTimeout(() => {
-		logger.info("👋 Leaving voice channel in guild " . message.member.guild.name );
-		message.channel.send('👋 Leaving voice channel due to inactivity')
+		
+		
 		var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
 		if(channel != null){
+			message.channel.send('👋 Leaving voice channel due to inactivity');
+			logger.info("👋 Leaving voice channel in guild " . message.guild.id );
 			channel.disconnect();
 			return;
 		}
