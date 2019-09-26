@@ -17,7 +17,7 @@ let authToken = "";
 let queues = [];
 let timers = {};
 
-const timeout = 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
+const timeout = 1000 * 5; // 1000 * 60 * 5 = 5 minutes;
 
 client.on('ready', () => {
 	// Try to login
@@ -68,12 +68,10 @@ client.on('message', message => {
 
 	// Set new timeout
 	timers[queueName] = setTimeout(() => {
-		
-		
 		var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
 		if(channel != null){
 			message.channel.send('👋 Leaving voice channel due to inactivity');
-			logger.info("👋 Leaving voice channel in guild " . message.guild.id );
+			logger.info("👋 Leaving voice channel in channel ");
 			channel.disconnect();
 			return;
 		}
