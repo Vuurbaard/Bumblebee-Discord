@@ -17,7 +17,7 @@ let authToken = "";
 let queues = [];
 let timers = {};
 
-const timeout = 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
+const timeout = (parseInt(process.env.CHANNEL_TIMEOUT) * 1000) || 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
 
 client.on('ready', () => {
 	// Try to login
