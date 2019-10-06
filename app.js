@@ -28,9 +28,8 @@ client.on('ready', () => {
 client.on('message', message => {
 
 	var me = this;
-	
 
-	if (message.channel.name != "bumblebee") { return; }
+	if(!message.channel.name.includes("bumblebee")){ return; }
 	if (!message.member.voiceChannel) { return; }
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
