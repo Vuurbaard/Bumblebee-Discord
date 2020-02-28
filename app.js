@@ -4,7 +4,7 @@
 require('dotenv').config();
 
 const log4js = require('log4js');
-var logger = log4js.getLogger();
+const logger = log4js.getLogger();
 logger.level = process.env.LOG_LEVEL;
 
 const Discord = require('discord.js');
@@ -26,24 +26,39 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-
-	var me = this;
+	
+	const me = this;
 
 	if(
-		!message.channel.name.includes("bumblebee") &&
-		message.content.includes("-tts")
-		){ return; }
-	if (!message.member.voiceChannel) { return; }
+		!(message.channel.name.indexOf("bumblebee") >= 0 ||
+		message.content.indexOf("-tts") >= 0)
+		){ 
+			return; 
+	}
 	if (!message.member) { return; }
+	if (!message.member.voice.channelID) { return; }
 	if (message.member.user.bot) { return; }
 
+	
 	// Only log in the bumblebee channel
 	logger.info("💬 " + message.author.username + ": " + message.content);
 
 	// 
+
+
+	// Generate unique name for the queue we are going to use
+	// Readable + unique
+	const queueName = message.member.guild.name + message.member.guild.id;
+
+	if (!queues[queueName]) {
+		queues[queueName] = new Queuer();
+	}
+
 	if(message.content === '!disconnect'){
 		try{
-			var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
+			const channel = client.voice.connections.find(val => val.channel.guild.id === message.guild.id);
+			let queue = queues[queueName];
+			queue.finish();
 			if(channel != null){
 				channel.disconnect();
 				return;
@@ -54,23 +69,16 @@ client.on('message', message => {
 		}
 	}
 
-	// Generate unique name for the queue we are going to use
-	// Readable + unique
-	var queueName = message.member.guild.name + message.member.guild.id;
-
-	if (!queues[queueName]) {
-		queues[queueName] = new Queuer();
-	}
-
 	// Use the queue name for timeout purposes
 	if(timers[queueName] != null){
 		logger.debug("⏰ Clearing timer for " + queueName);
 		clearTimeout(timers[queueName]);
 	}
 
+
 	// Set new timeout
 	timers[queueName] = setTimeout(() => {
-		var channel = client.voiceConnections.find(val => val.channel.guild.id === message.guild.id);
+		var channel = client.voice.connections.find(val => val.channel.guild.id === message.guild.id);
 		if(channel != null){
 			message.channel.send('👋 Leaving voice channel due to inactivity');
 			logger.info("👋 Leaving voice channel in channel ");
@@ -83,9 +91,9 @@ client.on('message', message => {
 	var queue = queues[queueName];
 
 	queue.push(function (queuer) {
-		message.member.voiceChannel.join().then(connection => {
+		message.member.voice.channel.join().then(connection => {
 			var options = {
-				url: 'http://' + api() + '/v1/tts',
+				url: api() + '/v1/tts',
 				body: { "text" : message.content },
 				json: true,
 				headers: { 'Authorization': this.authToken }
@@ -93,7 +101,6 @@ client.on('message', message => {
 
 			request.post(options, function (error, response, body) {
 				if (body.fragments && body.fragments.length > 0) {
-
 					let missingWords = body.fragments.filter(fragment => {
 						if (fragment._id) {
 							return false;
@@ -109,20 +116,23 @@ client.on('message', message => {
 				if (body && body.file) {
 
 					// let filepath = __dirname + '/../api' + body.file;
-					let filepath = 'http://' + api() + body.file;
+					let filepath = api() + body.file;
 					logger.info("📣 Playing file: " + filepath);
 
-					const dispatcher = connection.playStream(filepath, function (err, intent) {
-						logger.warn('🚨 error: ' + err.message);
-						logger.debug('ℹ️ intent: ' + intent.message);
-					});
+
+
+					const streamOptions = {
+						seek: 0,
+						volume: 1,
+						bitrate: 'auto'
+					}
+					const dispatcher = connection.play(filepath, streamOptions);
 
 					dispatcher.on('start', function () {
 						connection.player.streamingData.pausedTime = 0; // Fixes delays after starting different streams
 					});
 
-					dispatcher.on('end', function () {
-
+					dispatcher.on('finish', function () {
 						var options = {
 							url: filepath,
 							headers: { 'Authorization': this.authToken }
@@ -135,19 +145,18 @@ client.on('message', message => {
 							else {
 								logger.info("🗑 deleted audio at " + options.url);
 							}
-
 						});
 
 						queuer.finish();
 					});
 
 					dispatcher.on('error', function (reason) {
-						logger.warn('🚨 Dispatcher error: ' + reason.message);
-						logger.debug('ℹ️ Clearing queuer');
+						console.log(reason);
 						queuer.finish();
 					});
 
 					dispatcher.on('debug', function (info) {
+						console.log(info);
 						logger.debug(info);
 					});
 				}
@@ -158,6 +167,7 @@ client.on('message', message => {
 			});
 
 		}).catch(function (err) {
+			console.log(err);
 			logger.warn(err);
 			queuer.finish()
 		});
@@ -174,7 +184,7 @@ client.on('debug', info => {
 client.login(token());
 
 function api() {
-	return process.env.API_HOST + ':' + process.env.API_PORT;
+	return process.env.API_HOST;
 }
 
 function token() {
@@ -187,7 +197,7 @@ function login() {
 	var me = this;
 
 	var options = {
-		url: 'http://' + api() + '/v1/login',
+		url: api() + '/v1/login',
 		body: { "username": process.env.API_USERNAME, "password": process.env.API_PASSWORD },
 		json: true
 	};
@@ -215,7 +225,7 @@ function login() {
 
 function shutdown(data) {
 	console.log("Exit with code:" + data);
-	client.voiceConnections.forEach(function (connection, key) {
+	client.voice.connections.forEach(function (connection, key) {
 		// Disconnect
 		console.log("Disconnecting from: " + connection.channel.name);
 
@@ -226,21 +236,31 @@ function shutdown(data) {
 	process.kill(process.pid, data);
 }
 
-process.on('beforeExit', shutdown.bind());
+function makeid(length) {
+	let result           = '';
+	let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	let charactersLength = characters.length;
+	for ( let i = 0; i < length; i++ ) {
+	   result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+ }
+
+// process.on('beforeExit', shutdown.bind());
 
 //do something when app is closing
-process.on('exit', shutdown.bind());
+// process.on('exit', shutdown.bind());
 
 // //catches ctrl+c event
 
-process.on('SIGINT', shutdown.bind());
+// process.on('SIGINT', shutdown.bind());
 
 // // catches "kill pid" (for example: nodemon restart)
-process.on('SIGUSR1', shutdown.bind());
-process.once('SIGUSR2', shutdown.bind());
+// process.on('SIGUSR1', shutdown.bind());
+// process.once('SIGUSR2', shutdown.bind());
 
-process.on('uncaughtException', (err, origin) => {
-	console.log(err);
-	console.log(origin);
-	process.exit(-1);
-  });
+// process.on('uncaughtException', (err, origin) => {
+// 	console.log(err);
+// 	console.log(origin);
+// 	process.exit(1);
+//   });

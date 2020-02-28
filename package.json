@@ -4,20 +4,26 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-smart": "if test \"$NODE_ENV\" = \"production\" ; then npm run start ; else npm run start-dev;  fi ",
+    "start-dev": "nodemon -L --exec \"node --inspect=0.0.0.0:5858 ./app.js\"",
+    "start": "node ./app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/uws": "^11.149.1",
-    "bufferutil": "^3.0.5",
-    "discord.js": "^11.5.1",
+    "@discordjs/opus": "^0.1.0",
+    "discord.js": "^12.1.0",
     "dotenv": "^8.2.0",
-    "log4js": "^5.3.0",
-    "node-opus": "^0.3.3",
-    "opusscript": "0.0.7",
-    "request": "^2.88.0",
+    "ffmpeg-static": "^4.0.1",
+    "log4js": "^6.1.2",
+    "request": "^2.88.2",
     "zlib-sync": "^0.1.6"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "nodemonConfig": {
+    "ignore": [
+      "tmp/"
+    ],
+    "delay": "500"
+  }
 }
