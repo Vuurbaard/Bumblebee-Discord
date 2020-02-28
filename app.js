@@ -29,7 +29,10 @@ client.on('message', message => {
 
 	var me = this;
 
-	if(!message.channel.name.includes("bumblebee")){ return; }
+	if(
+		!message.channel.name.includes("bumblebee") &&
+		message.content.includes("-tts")
+		){ return; }
 	if (!message.member.voiceChannel) { return; }
 	if (!message.member) { return; }
 	if (message.member.user.bot) { return; }
@@ -215,6 +218,7 @@ function shutdown(data) {
 	client.voiceConnections.forEach(function (connection, key) {
 		// Disconnect
 		console.log("Disconnecting from: " + connection.channel.name);
+
 		connection.disconnect();
 	});
 	client.destroy();
@@ -228,8 +232,15 @@ process.on('beforeExit', shutdown.bind());
 process.on('exit', shutdown.bind());
 
 // //catches ctrl+c event
+
 process.on('SIGINT', shutdown.bind());
 
 // // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', shutdown.bind());
 process.once('SIGUSR2', shutdown.bind());
+
+process.on('uncaughtException', (err, origin) => {
+	console.log(err);
+	console.log(origin);
+	process.exit(-1);
+  });

@@ -1,31 +1,21 @@
-FROM node:8
+FROM node:11-alpine as builder
 ARG NPM_INSTALL_BEFORE=true
-RUN mkdir -p /var/www/html
-RUN npm install -g nodemon
-
-COPY ./package.json /tmp/package.json
-
-WORKDIR /var/www/html
-COPY ./ /var/www/html
-COPY "docker/start.sh" /var/www/start.sh
-
-RUN if [ $NPM_INSTALL_BEFORE = "true" ]; then \
-    ls /tmp && \
-    cd /tmp && \
-    npm install && \
-    mkdir -p /var/www/html && cp -a /tmp/node_modules /var/www/html ; \
-    fi
-
-RUN sed -i "s/jessie main/jessie main contrib non-free/" /etc/apt/sources.list
-RUN echo "deb http://http.debian.net/debian jessie-backports main contrib non-free" >> /etc/apt/sources.list
-RUN apt-get update && apt-get install -y \
-    ffmpeg
-
-RUN apt-get install -y locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8
-
+ENV NODE_ENV production
 ENV LC_ALL C.UTF-8
+WORKDIR /var/www/html
+RUN mkdir -p /var/www/html
+COPY ./ /var/www/html
+RUN mkdir -p /var/www/html/tmp
+RUN npm install --production
 
+
+FROM node:11-alpine
+ENV NODE_ENV production
+ENV LC_ALL C.UTF-8
+RUN apk add --update --no-cache ffmpeg opus
+WORKDIR /var/www/html
+RUN mkdir -p /var/www/html/tmp
+COPY "docker/start.sh" /var/www/start.sh
 RUN chmod +x /var/www/start.sh
-CMD bash /var/www/start.sh 
+COPY --from=builder /var/www/html /var/www/html
+CMD sh /var/www/start.sh 
