@@ -4,8 +4,6 @@ services:
         image: ${CI_REGISTRY}/bumblebee/discord:latest
         environment:
             - NODE_ENV=production
-            - API_HOST=$API_HOST
-            - API_TOKEN=$API_TOKEN
             - LOG_INFO=info
         deploy:
             restart_policy:
