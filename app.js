@@ -19,6 +19,8 @@ let timers = {};
 
 const timeout = (parseInt(process.env.CHANNEL_TIMEOUT) * 1000) || 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
 
+console.log(process.env);
+
 client.on('ready', () => {
 	// Try to login
 	login();
