@@ -30,6 +30,9 @@ push to production:
     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $CI_REGISTRY
     - docker stack deploy --prune --resolve-image=always --with-registry-auth --compose-file=docker-stack-compose.yml ${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
   dependencies: []
+  variables:
+    - API_HOST=$API_HOST
+    - API_TOKEN=$API_TOKEN
   environment:
     name: discord-bumblebee-fm
   only:
