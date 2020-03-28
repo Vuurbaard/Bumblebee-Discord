@@ -1,0 +1,36 @@
+image: docker:stable
+
+stages:
+ - build
+ - deploy
+
+build prod:
+  image: docker:dind
+  stage: build
+  script:
+    # install composer and get dependencies
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t ${CI_REGISTRY}/bumblebee/discord:latest --build-arg BUILD_PROD=true -f docker/Dockerfile ./
+    - docker push ${CI_REGISTRY}/bumblebee/discord:latest
+  only:
+    - master
+
+
+# Push the image to Docker Swarm as service and run a rolling deploy
+push to production:
+  stage: deploy
+  variables:
+    DOCKER_HOST: ssh://$SSH_USER@$SSH_HOST
+  image: docker:stable
+  script:
+    - apk add openssh --no-cache
+    - mkdir -p ~/.ssh/ &&  echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - eval $(ssh-agent -s)
+    - chmod 600 $SSH_KEY && ssh-add $SSH_KEY
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $CI_REGISTRY
+    - docker stack deploy --prune --resolve-image=always --with-registry-auth --compose-file=docker-stack-compose.yml ${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+  dependencies: []
+  environment:
+    name: discord-bumblebee-fm
+  only:
+    - master
