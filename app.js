@@ -19,8 +19,6 @@ let timers = {};
 
 const timeout = (parseInt(process.env.CHANNEL_TIMEOUT) * 1000) || 1000 * 60 * 5; // 1000 * 60 * 5 = 5 minutes;
 
-console.log(process.env);
-
 client.on('ready', () => {
 	// Try to login
 	login();
@@ -80,7 +78,7 @@ client.on('message', message => {
 
 	// Set new timeout
 	timers[queueName] = setTimeout(() => {
-		var channel = client.voice.connections.find(val => val.channel.guild.id === message.guild.id);
+		const channel = client.voice.connections.find(val => val.channel.guild.id === message.guild.id);
 		if(channel != null){
 			message.channel.send('👋 Leaving voice channel due to inactivity');
 			logger.info("👋 Leaving voice channel in channel ");
@@ -90,11 +88,11 @@ client.on('message', message => {
 	}, timeout);
 
 	// Current queue for guild (aka server)
-	var queue = queues[queueName];
+	const queue = queues[queueName];
 
 	queue.push(function (queuer) {
 		message.member.voice.channel.join().then(connection => {
-			var options = {
+			const options = {
 				url: api() + '/v1/tts',
 				body: { "text" : message.content },
 				json: true,
@@ -121,8 +119,6 @@ client.on('message', message => {
 					let filepath = api() + body.file;
 					logger.info("📣 Playing file: " + filepath);
 
-
-
 					const streamOptions = {
 						seek: 0,
 						volume: 1,
@@ -135,7 +131,7 @@ client.on('message', message => {
 					});
 
 					dispatcher.on('finish', function () {
-						var options = {
+						const options = {
 							url: filepath,
 							headers: { 'Authorization': this.authToken }
 						};
@@ -153,12 +149,10 @@ client.on('message', message => {
 					});
 
 					dispatcher.on('error', function (reason) {
-						console.log(reason);
 						queuer.finish();
 					});
 
 					dispatcher.on('debug', function (info) {
-						console.log(info);
 						logger.debug(info);
 					});
 				}
@@ -169,14 +163,12 @@ client.on('message', message => {
 			});
 
 		}).catch(function (err) {
-			console.log(err);
 			logger.warn(err);
 			queuer.finish()
 		});
 	});
 
 	queue.run();
-
 });
 
 client.on('debug', info => {
@@ -194,7 +186,7 @@ function token() {
 }
 
 function login() {
-	logger.info('Ready to rollout');
+	logger.info('🏎 Ready to rollout');
 
 	var me = this;
 
@@ -218,7 +210,7 @@ function login() {
 			// Seems like the API is down?
 			logger.warn('🚨 Cannot connect to api', options)
 			setTimeout(() => {
-				logger.info('Trying to log back in again');
+				logger.info('🔁 Trying to log back in again');
 				login();
 			}, 5000)
 		}
