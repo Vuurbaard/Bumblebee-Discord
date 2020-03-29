@@ -10,6 +10,7 @@ build prod:
   script:
     # install composer and get dependencies
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - cp $ENV_FILE .env
     - docker build -t ${CI_REGISTRY}/bumblebee/discord:latest --build-arg BUILD_PROD=true -f docker/Dockerfile ./
     - docker push ${CI_REGISTRY}/bumblebee/discord:latest
   only:
