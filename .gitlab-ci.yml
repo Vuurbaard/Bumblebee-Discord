@@ -29,7 +29,7 @@ push to production:
     - eval $(ssh-agent -s)
     - chmod 600 $SSH_KEY && ssh-add $SSH_KEY
     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $CI_REGISTRY
-    - docker stack deploy --prune --resolve-image=always --with-registry-auth --compose-file=docker-stack-compose.yml ${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+    - docker stack deploy --prune --with-registry-auth --compose-file=docker-stack-compose.yml ${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
   dependencies: []
   environment:
     name: discord-bumblebee-fm
