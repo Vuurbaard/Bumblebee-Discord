@@ -253,8 +253,8 @@ function makeid(length) {
 // process.on('SIGUSR1', shutdown.bind());
 // process.once('SIGUSR2', shutdown.bind());
 
-// process.on('uncaughtException', (err, origin) => {
-// 	console.log(err);
-// 	console.log(origin);
-// 	process.exit(1);
-//   });
+process.on('uncaughtException', (err, origin) => {
+	console.log(err);
+	console.log(origin);
+	process.exit(1);
+  });
