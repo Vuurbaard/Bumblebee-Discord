@@ -1,7 +1,7 @@
 version: '3.6'
 services:
     discord:
-        image: ${CI_REGISTRY}/bumblebee/discord:latest
+        image: ${CI_REGISTRY_IMAGE}:latest
         environment:
             - NODE_ENV=production
             - LOG_INFO=info
