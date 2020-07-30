@@ -31,7 +31,7 @@ push to production:
   stage: deploy
   variables:
     DOCKER_HOST: ssh://$SSH_USER@$SSH_HOST
-  image: docker:stable
+  image: $DOCKER_IMAGE
   script:
     - apk add openssh --no-cache
     - mkdir -p ~/.ssh/ &&  echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
