@@ -175,7 +175,10 @@ client.on('debug', info => {
 	logger.debug(info);
 });
 
-client.login(token());
+client.login(token()).catch(() => {
+	console.log("Failed to login due to uncaught error");
+	process.exit(1);
+});
 
 function api() {
 	return process.env.API_HOST;
