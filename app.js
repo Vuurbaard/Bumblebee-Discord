@@ -175,8 +175,9 @@ client.on('debug', info => {
 	logger.debug(info);
 });
 
-client.login(token()).catch(() => {
+client.login(token()).catch((exception) => {
 	console.log("Failed to login due to uncaught error");
+	console.log(exception);
 	process.exit(1);
 });
 
