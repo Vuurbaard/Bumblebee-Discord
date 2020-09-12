@@ -22,7 +22,7 @@ const timeout = (parseInt(process.env.CHANNEL_TIMEOUT) * 1000) || 1000 * 60 * 5;
 client.on('ready', () => {
 	// Try to login
 	login();
-	client.user.setPresence({ game: { name: 'bmbl.mijnproject.nu', type: 2 } }).then((data) => { logger.debug(data)}).catch(console.error);
+	client.user.setPresence({ game: { name: 'bmbl.cloud', type: 2 } }).then((data) => { logger.debug(data)}).catch(console.error);
 });
 
 client.on('message', message => {
