@@ -5,7 +5,6 @@ export default class Queue {
     private jobs: Array<Function> = [];
     private running: boolean = false;
     private stackSize: number = 25;
-    private poller?: number;
 
     constructor(){
         setInterval(this.run, 1000);

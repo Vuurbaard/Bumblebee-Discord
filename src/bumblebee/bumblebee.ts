@@ -16,7 +16,7 @@ export class Bumblebee {
 
     public async tts(message: string){
         const options = {
-            url: this.host + '/v1/tts',
+            url: this.host + '/v1/tts?format=opus',
             body: { "text" : message },
             json: true,
             headers: { 'Authorization': this.token }
@@ -24,8 +24,15 @@ export class Bumblebee {
 
         let data = await request.post(options);
         if(data && data.file){
-            let file = temp.createWriteStream({ suffix: '.mp3' });
-            await request.get(this.host + data.file).pipe(file);
+            let file = temp.createWriteStream({ suffix: '.opus' });
+            let stream = request.get(this.host + data.file).pipe(file);
+
+            console.log("Full fill");
+            await new Promise(fullfill => stream.on('finish', () => {
+                console.log(" stream done");
+                fullfill();
+            }));
+            console.log("Done?");
 
             return file.path as string;
         }

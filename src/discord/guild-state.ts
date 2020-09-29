@@ -1,13 +1,16 @@
 
-import { Guild, VoiceChannel } from 'discord.js';
+import { BroadcastDispatcher, Guild, VoiceChannel, VoiceConnection } from 'discord.js';
+import { Readable, Stream, Writable } from 'stream';
 import { container } from 'tsyringe';
 import { Log } from '../app/log';
 import Queue from './queue/queue';
+import * as fs from 'fs';
 
 export class GuildState {
     private guild: Guild;
     private voiceQueue: Queue;
     private voiceChannel?: VoiceChannel;
+    private connection?: VoiceConnection;
 
     constructor(guild: Guild){
         this.guild = guild;
@@ -24,26 +27,36 @@ export class GuildState {
 
         this.voiceQueue.push(async (queue: Queue) => {
             if(this.voiceChannel){
-                let connection = await this.voiceChannel.join();
+                if(!this.connection){
+                    this.connection = await this.voiceChannel.join();
+                }              
+
+                if(this.connection.dispatcher){
+                    console.log("KILL?");
+                    this.connection.dispatcher.end();    
+                }
+
+
                 try{
-                    console.log(file);
-                    let dispatcher = connection.play(file);
+                    let dispatcher = this.connection.play(file, {
+                        'bitrate': 'auto',
+                        'highWaterMark': 16
+                    });
                 
+                    let _vm = this;
                     dispatcher.on('start', function () {
-                        let player = connection.player as any;
-                        player.streamingData.pausedTime = 0;
+                        if(_vm.connection){
+                            let player = _vm.connection.player as any;
+                            player.streamingData.pausedTime = 0;
+                        }
                     });
 
-    
                     dispatcher.on('finish', function () {
-                        let player = connection.player as any;
-                        player.streamingData.pausedTime = 0;
+                        console.log("finish");
                         queue.finish();
                     });
     
                     dispatcher.on('error', function (reason) {
-                        let player = connection.player as any;
-                        player.streamingData.pausedTime = 0;
                         queue.finish();
                     });
     
