@@ -1,7 +1,8 @@
 version: '3.6'
+
 services:
     discord:
-        image: ${CI_REGISTRY_IMAGE}:latest
+        image: ${DISCORD_IMAGE}
         environment:
             - NODE_ENV=production
             - LOG_INFO=info

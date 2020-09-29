@@ -27,12 +27,9 @@ export class Bumblebee {
             let file = temp.createWriteStream({ suffix: '.opus' });
             let stream = request.get(this.host + data.file).pipe(file);
 
-            console.log("Full fill");
             await new Promise(fullfill => stream.on('finish', () => {
-                console.log(" stream done");
-                fullfill();
+                fullfill()
             }));
-            console.log("Done?");
 
             return file.path as string;
         }

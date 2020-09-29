@@ -52,7 +52,6 @@ export class GuildState {
                     });
 
                     dispatcher.on('finish', function () {
-                        console.log("finish");
                         queue.finish();
                     });
     
