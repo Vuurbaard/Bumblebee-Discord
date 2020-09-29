@@ -7,7 +7,6 @@ import { Command } from "./commands/command";
 import { StateManager } from "./state-manager";
 import { TTS } from "./commands/tts";
 import { Bumblebee } from "../bumblebee/bumblebee";
-import { Logger } from "log4js";
 
 
 @injectable()

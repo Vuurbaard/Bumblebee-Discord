@@ -25,26 +25,36 @@ export class GuildState {
         this.voiceQueue.push(async (queue: Queue) => {
             if(this.voiceChannel){
                 let connection = await this.voiceChannel.join();
-
-                let dispatcher = connection.play(file);
+                try{
+                    console.log(file);
+                    let dispatcher = connection.play(file);
                 
-                dispatcher.on('start', function () {
-                    let player = connection.player as any;
-                    player.streamingData.pausedTime = 0;
-                });
+                    dispatcher.on('start', function () {
+                        let player = connection.player as any;
+                        player.streamingData.pausedTime = 0;
+                    });
 
-                dispatcher.on('finish', function () {
+    
+                    dispatcher.on('finish', function () {
+                        let player = connection.player as any;
+                        player.streamingData.pausedTime = 0;
+                        queue.finish();
+                    });
+    
+                    dispatcher.on('error', function (reason) {
+                        let player = connection.player as any;
+                        player.streamingData.pausedTime = 0;
+                        queue.finish();
+                    });
+    
+                    dispatcher.on('debug', function (info) {
+                        console.debug(info)
+                    });
+                }catch(e){
+                    console.error(e);
                     queue.finish();
-                });
-
-                dispatcher.on('error', function (reason) {
-                    console.error(reason);
-                    queue.finish();
-                });
-
-                dispatcher.on('debug', function (info) {
-                    console.debug(info)
-                });
+                }
+ 
             }
         });
 

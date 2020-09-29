@@ -7,11 +7,11 @@ services:
             args:
                 - NPM_GLOBAL_PACKAGES=nodemon typescript
                 - BUILD_PROD=false
-        volumes:
-            - .:/var/www/html
-            - ./node_modules:/var/www/html/node_modules:delegated
+        # volumes:
+        #     - .:/var/www/html
+        #     - ./node_modules:/var/www/html/node_modules:delegated
         environment:
-            - NODE_ENV=production
+            - NODE_ENV=development
         container_name: "discord"
         # networks:
         #   - api_bumblebee-net

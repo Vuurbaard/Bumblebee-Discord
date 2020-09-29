@@ -7,6 +7,10 @@ export default class Queue {
     private stackSize: number = 25;
     private poller?: number;
 
+    constructor(){
+        setInterval(this.run, 1000);
+    }
+
     public push(func: Function): any
     {
         if(this.jobs.length < this.stackSize){
@@ -18,8 +22,8 @@ export default class Queue {
 
     public run() {
         let log = container.resolve(Log);
-        log.info("Running queue with:", this.jobs.length, "in queue");
-        if(!this.running && this.jobs.length > 0){
+        if(!this.running && Array.isArray(this.jobs) && this.jobs.length > 0){
+            log.info("Running queue with:", this.jobs.length, "in queue");
             this.running = true;
             let task = this.jobs.shift();
             if(task) {
@@ -37,4 +41,6 @@ export default class Queue {
         this.running = false;
 		this.run();
     }
+
+    
 }
