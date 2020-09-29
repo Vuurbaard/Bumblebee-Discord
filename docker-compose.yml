@@ -6,7 +6,7 @@ services:
             dockerfile: docker/Dockerfile
             args:
                 - NPM_GLOBAL_PACKAGES=nodemon typescript
-                - BUILD_PROD=false
+                - BUILD_PROD=true
         # volumes:
         #     - .:/var/www/html
         #     - ./node_modules:/var/www/html/node_modules:delegated
