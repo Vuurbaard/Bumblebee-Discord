@@ -4,13 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "watch": "tsc --watch",
-    "debug": "nodemon --watch ./dist --inspect=0.0.0.0:5858 ./dist/server.js",
-    "compile": "tsc",
-    "compile-and-run": "tsc && node ./dist/server.js",
     "start-smart": "if test \"$NODE_ENV\" = \"production\" ; then npm run start ; else npm run start-dev;  fi ",
-    "start-dev": "nodemon -e ts --exec \"npm run compile-and-run\"",
-    "start": "node ./dist/server.js"
+    "start-dev": "nodemon -L --exec \"node --inspect=0.0.0.0:5858 ./app.js\"",
+    "start": "node ./app.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,20 +15,10 @@
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "log4js": "^6.3.0",
-    "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
-    "request-promise-native": "^1.0.9",
-    "temp": "^0.9.1",
-    "tsyringe": "^4.3.0",
     "zlib-sync": "^0.1.7"
   },
-  "devDependencies": {
-    "@types/node": "^14.10.1",
-    "@types/request": "^2.48.5",
-    "@types/request-promise-native": "^1.0.17",
-    "@types/temp": "^0.8.34",
-    "@types/ws": "^7.2.6"
-  },
+  "devDependencies": {},
   "nodemonConfig": {
     "ignore": [
       "tmp/"
