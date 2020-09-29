@@ -4,8 +4,10 @@ import * as Discord from 'discord.js';
 import { Environment } from "../app/environment";
 import { Log } from "../app/log";
 import { Command } from "./commands/command";
-import instance from "tsyringe/dist/typings/dependency-container";
+import { StateManager } from "./state-manager";
 import { TTS } from "./commands/tts";
+import { Bumblebee } from "../bumblebee/bumblebee";
+import { Logger } from "log4js";
 
 
 @injectable()
@@ -16,11 +18,12 @@ export class DiscordHandler implements Bootable {
 
     constructor(
         @inject(Environment) private env: Environment ,
-        @inject(Log) private log: Log 
+        @inject(Log) private log: Log ,
+        @inject(StateManager) private stagemanager: StateManager 
     ){
         this.client = new Discord.Client();
         this.commands = [
-            new TTS()
+            new TTS(container.resolve(Bumblebee), container.resolve(Log))
         ];
 
     }
@@ -64,13 +67,13 @@ export class DiscordHandler implements Bootable {
 
         
         // Force -tts when using bumblebee channel
-        if( msg.channel instanceof Discord.TextChannel && msg.channel.name.indexOf("bumblebee") ){
+        if( msg.channel instanceof Discord.TextChannel && msg.channel.name.indexOf("bumblebee") >= 0 ){
             msg.content = this.env.get('DISCORD_COMMAND_PREFIX') + 'tts ' + msg.content;
         }
         
         let command = this.parseCommand(msg);
 
-        if(command != null) {
+        if(command){
             command();
         }
     }
@@ -83,7 +86,7 @@ export class DiscordHandler implements Bootable {
         // Check if we match prefix
         if(content.length > prefix.length && content.slice(0,prefix.length) === prefix){
             // First parse content to figure out what we are doing
-            let str = content.substr(prefix.length, content.length - 1).trim().replace(/ +(?= )/g,'');
+            let str = content.substr(prefix.length, content.length - prefix.length).trim().replace(/ +(?= )/g,'');
             let parsed = str.split(' ');
 
             if(parsed.length > 0) {
@@ -110,6 +113,8 @@ export class DiscordHandler implements Bootable {
 
                     // Transform to map now
                     let mappedArgs = new Map<string,string>();
+                    mappedArgs.set('rawCommand', content);
+                    mappedArgs.set('rawArguments', parsed.join(' '));
                     
                     if(matches !== undefined) {
                         for (let index = 0; index < matches.length; index++) {
@@ -121,8 +126,11 @@ export class DiscordHandler implements Bootable {
                     }
 
                     return () => {
-                        this.log.debug('Executing command ' + target?.name);
-                        target?.execute(msg, mappedArgs);
+                        let guildState = this.stagemanager.getByMessage(msg);
+                        if(guildState){
+                            this.log.debug('Executing command ' + target?.name);
+                            target?.execute(msg, mappedArgs, guildState);
+                        }
                     };
                 }
             }

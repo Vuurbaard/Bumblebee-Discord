@@ -16,7 +16,7 @@ export class Environment {
         });
     }
 
-    public get(name: string) : string {
-        return process.env[name] ?? '';
+    public get(name: string, def: string = '') : string {
+        return process.env[name] ?? def;
     }
 }
