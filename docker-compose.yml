@@ -5,11 +5,11 @@ services:
             context: ./
             dockerfile: docker/Dockerfile
             args:
-                - NPM_GLOBAL_PACKAGES=nodemon
-                - BUILD_PROD=false
-        volumes:
-            - .:/var/www/html
-            - ./node_modules:/var/www/html/node_modules:delegated
+                - NPM_GLOBAL_PACKAGES=nodemon typescript
+                - BUILD_PROD=true
+        # volumes:
+        #     - .:/var/www/html
+        #     - ./node_modules:/var/www/html/node_modules:delegated
         environment:
             - NODE_ENV=development
         container_name: "discord"
