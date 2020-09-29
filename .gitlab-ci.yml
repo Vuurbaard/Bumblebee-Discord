@@ -9,7 +9,7 @@ variables:
   DOCKER_DIND_IMAGE: "docker:19.03.12-dind"
   DOCKER_IMAGE: "docker:19.03.12"
 
-build prod:
+build master:
   image: ${DOCKER_IMAGE}
   services:
     - ${DOCKER_DIND_IMAGE}
@@ -23,12 +23,28 @@ build prod:
   only:
     - master
 
+build production image:
+  image: ${DOCKER_IMAGE}
+  services:
+    - ${DOCKER_DIND_IMAGE}
+  stage: build
+  variables:
+    IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+  script:
+    # install composer and get dependencies
+    - cp $ENV_FILE .env
+    - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG} --build-arg BUILD_PROD=true -f docker/Dockerfile ./
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+  only:
+    - tags
 
 # Push the image to Docker Swarm as service and run a rolling deploy
-push to production:
+deploy production:
   stage: deploy
   variables:
     DOCKER_HOST: ssh://$SSH_USER@$SSH_HOST
+    DISCORD_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
   image: $DOCKER_IMAGE
   script:
     - apk add openssh --no-cache
@@ -41,4 +57,4 @@ push to production:
   environment:
     name: discord-bumblebee-fm
   only:
-    - master
+    - tags
