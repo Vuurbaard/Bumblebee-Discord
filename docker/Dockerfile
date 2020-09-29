@@ -12,6 +12,7 @@ RUN if [ ! -z "$NPM_GLOBAL_PACKAGES" ] ; then npm install -g $NPM_GLOBAL_PACKAGE
 RUN if [ "$BUILD_PROD" = "true" ] ; then \
     apk add --no-cache --virtual .gyp python make g++ ; \
     npm ci --production ; \
+    npm run compile ; \
     apk del .gyp ; \
 fi
 CMD npm run start-smart
