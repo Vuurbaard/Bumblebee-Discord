@@ -27,12 +27,12 @@ export class GuildState {
 
         this.voiceQueue.push(async (queue: Queue) => {
             if(this.voiceChannel){
-                if(!this.connection){
+                
+                if(!this.connection || (this.connection && this.connection.channel.id != this.voiceChannel.id)){
                     this.connection = await this.voiceChannel.join();
                 }              
 
                 if(this.connection.dispatcher){
-                    console.log("KILL?");
                     this.connection.dispatcher.end();    
                 }
 
