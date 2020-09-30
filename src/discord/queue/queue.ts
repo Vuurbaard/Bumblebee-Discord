@@ -41,5 +41,7 @@ export default class Queue {
 		this.run();
     }
 
-    
+    public size(){
+        return this.jobs.length;
+    }
 }

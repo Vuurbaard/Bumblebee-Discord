@@ -11,6 +11,7 @@ export class GuildState {
     private voiceQueue: Queue;
     private voiceChannel?: VoiceChannel;
     private connection?: VoiceConnection;
+    private timer?: NodeJS.Timeout;
 
     constructor(guild: Guild){
         this.guild = guild;
@@ -27,7 +28,8 @@ export class GuildState {
 
         this.voiceQueue.push(async (queue: Queue) => {
             if(this.voiceChannel){
-                
+                this.clearCounter();
+
                 if(!this.connection || (this.connection && this.connection.channel.id != this.voiceChannel.id)){
                     this.connection = await this.voiceChannel.join();
                 }              
@@ -35,6 +37,7 @@ export class GuildState {
                 if(this.connection.dispatcher){
                     this.connection.dispatcher.end();    
                 }
+                let _vm = this;
 
 
                 try{
@@ -50,12 +53,14 @@ export class GuildState {
                             player.streamingData.pausedTime = 0;
                         }
                     });
-
+                    
                     dispatcher.on('finish', function () {
+                        _vm.setCounter();
                         queue.finish();
                     });
     
                     dispatcher.on('error', function (reason) {
+                        _vm.setCounter();
                         queue.finish();
                     });
     
@@ -71,6 +76,31 @@ export class GuildState {
         });
 
         this.voiceQueue.run();
+    }
+
+    private clearCounter() {
+        if(this.timer){
+            clearTimeout(this.timer);
+        }
+    }
+
+    private setCounter() {
+        this.clearCounter();
+        
+        let _vm = this;
+        this.timer = setTimeout( function() {
+            console.log("Maybe i should leave")
+            if(_vm.voiceChannel){
+                console.log("lets leave");
+                _vm.voiceChannel.leave();
+                delete _vm.voiceChannel;
+            }
+
+            if(_vm.connection){
+                _vm.connection.disconnect();
+                delete _vm.connection;
+            }
+        }, 300000);
     }
 
     public setVoiceChannel(channel: VoiceChannel){
