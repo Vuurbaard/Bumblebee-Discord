@@ -1,6 +1,5 @@
 import { Command } from "./command";
 import * as Discord from 'discord.js';
-import { GuildState } from "../guild-state";
 import { container, injectable } from "tsyringe";
 import { Bumblebee } from "../../bumblebee/bumblebee";
 import { Log } from "../../app/log";
@@ -23,9 +22,11 @@ export class TTS extends Command {
 
     public execute(args: CommandArguments, message: Discord.Message) : void {
         let text = args.arguments().join(' ').trim();
+        let stateManager = container.resolve(StateManager);
+        let guildState = stateManager.getByMessage(message);
         
         if(text.length > 0 ){
-            this.log.debug('Retrieving tts for', text);
+            this.log.info('Retrieving tts for', text, ' for guild ', guildState?.getGuildId() );
             this.bumblebee.tts(text).then((data) => {
                 
                 if(data){
@@ -40,10 +41,10 @@ export class TTS extends Command {
                         message.reply('Missing words: ' +  str.substring(0, lastC) + ' and ' + str.substring(lastC + delimit.length, str.length));
                     }
 
-                    let stateManager = container.resolve(StateManager);
-                    let guildState = stateManager.getByMessage(message);
+
                     if(guildState && message.member && message.member.voice && message.member.voice.channel){
-                        guildState.setVoiceChannel(message?.member?.voice.channel);
+                        this.log.info('💬 TTS to ', message.member.voice.channel.name );
+                        guildState.setVoiceChannel(message.member.voice.channel);
                         guildState.addToVoiceQueue(data.getFile());
                     }
                 } else {

@@ -36,6 +36,11 @@ export default class Queue {
         }
     }
 
+    public clear() {
+        this.jobs = [];
+        this.running = false;
+    }
+
     public finish(){
         this.running = false;
 		this.run();

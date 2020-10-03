@@ -118,6 +118,8 @@ export class GuildState {
             this.connection.disconnect();
             delete this.connection;
         }
+
+        this.voiceQueue.clear();
     }
 
 }
