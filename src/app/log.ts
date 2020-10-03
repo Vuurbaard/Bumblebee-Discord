@@ -12,27 +12,27 @@ export class Log {
         this.logger.level = env.get('LOG_LEVEL');
     }
 
-    public info(message: string, ...args: any[]) {
+    public info(message: string, ...args: any[]): this {
         this.logger.info(message, ...args);
         return this;
     }
 
-    public warn(message: string, ...args: any[]) {
+    public warn(message: string, ...args: any[]): this {
         this.logger.warn(message, ...args);
         return this;
     }
 
-    public debug(message: string, ...args: any[]) {
+    public debug(message: string, ...args: any[]): this {
         this.logger.debug(message, ...args);
         return this;
     }
 
-    public error(message: string, ...args: any[]) {
+    public error(message: string, ...args: any[]): this {
         this.logger.error(message, ...args);
         return this;
     }
 
-    public fatal(message: string, ...args: any[]) {
+    public fatal(message: string, ...args: any[]): this {
         this.logger.fatal(message, ...args);
         return this;
     }

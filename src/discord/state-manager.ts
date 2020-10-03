@@ -14,7 +14,7 @@ export class StateManager {
     {
         let guildState = null;
 
-        let found = this.guilds.filter((guildState: GuildState) => {
+        const found = this.guilds.filter((guildState: GuildState) => {
             return guildState.getGuildId() == msg.guild?.id;
         });
 

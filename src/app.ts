@@ -1,5 +1,5 @@
 import { Bootable } from "./app/bootable";
-import "reflect-metadata";
+
 import {container, InjectionToken} from "tsyringe";
 import { Environment } from "./app/environment";
 import { DiscordHandler } from "./discord/handler";
@@ -29,17 +29,17 @@ export class App {
     }
 
 
-    public addBootable(bootable: Bootable){
+    public addBootable(bootable: Bootable): this{
         this.bootables.push(bootable);
 
         return this;
     }
 
-    public boot()
+    public boot() : this
     {
         this.log.info('Bootstrapping Application');
         
-        let waitForBoot = this.bootables.map((bootable: Bootable) => {
+        const waitForBoot = this.bootables.map((bootable: Bootable) => {
             return new Promise((res,rej) => {
                 this.log.debug('Booting ' + bootable.constructor.name);
                 bootable.boot().then((bootable: Bootable) => {
@@ -59,10 +59,10 @@ export class App {
         return this;
     }
 
-    public async shutdown()
+    public async shutdown(): Promise<void>
     {
         this.log.info('Application shutdown initiated');
-        let waitForShutdown = this.bootables.map((bootable: Bootable) => {
+        const waitForShutdown = this.bootables.map((bootable: Bootable) => {
             return new Promise((res,rej) => {
                 this.log.debug('Booting ' + bootable.constructor.name);
                 return res(bootable.shutdown());
@@ -78,7 +78,7 @@ export class App {
         return container.resolve(token);
     }
 
-    public isBooted()
+    public isBooted(): boolean
     {
         return this.booted.length === this.bootables.length;
     }

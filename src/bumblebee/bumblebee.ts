@@ -23,10 +23,10 @@ export class Bumblebee {
             headers: { 'Authorization': this.token }
         };
 
-        let data = await request.post(options);
+        const data = await request.post(options);
         if(data && data.file){
-            let file = temp.createWriteStream({ suffix: '.opus' });
-            let stream = request.get(this.host + data.file).pipe(file);
+            const file = temp.createWriteStream({ suffix: '.opus' });
+            const stream = request.get(this.host + data.file).pipe(file);
 
             await new Promise(fullfill => stream.on('finish', () => {
                 fullfill()

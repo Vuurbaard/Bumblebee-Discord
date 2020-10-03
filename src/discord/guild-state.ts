@@ -23,10 +23,8 @@ export class GuildState {
     }
 
     public skipItem(){
-        if(this.voiceQueue.size() > 0){
-            if(this.connection && this.voiceChannel){
-                this.connection.dispatcher.end();
-            }
+        if(this.voiceQueue.size() >= 0 && this.connection && this.voiceChannel){
+            this.connection.dispatcher.end();
         }
     }
 
@@ -44,19 +42,20 @@ export class GuildState {
                 if(this.connection.dispatcher){
                     this.connection.dispatcher.end();    
                 }
-                let _vm = this;
 
+                const _vm = this;
 
                 try{
-                    let dispatcher = this.connection.play(file, {
+
+                    const dispatcher = this.connection.play(file, {
                         'bitrate': 'auto',
                         'highWaterMark': 16
                     });
                 
-                    let _vm = this;
+                    const _vm = this;
                     dispatcher.on('start', function () {
                         if(_vm.connection){
-                            let player = _vm.connection.player as any;
+                            const player = _vm.connection.player as any;
                             player.streamingData.pausedTime = 0;
                         }
                     });
@@ -76,6 +75,7 @@ export class GuildState {
                     });
                 }catch(e){
                     console.error(e);
+                    log.error(e);
                     queue.finish();
                 }
  
@@ -94,7 +94,7 @@ export class GuildState {
     private setCounter() {
         this.clearCounter();
         
-        let _vm = this;
+        const _vm = this;
         this.timer = setTimeout( function() {
             _vm.disconnect();
         }, 300000);

@@ -9,14 +9,14 @@ import { singleton } from 'tsyringe';
 export class Environment {
 
     constructor() {
-        let dotEnvPath = fs.existsSync(path.resolve(process.cwd(), '..','.env')) ? path.resolve(process.cwd(), '..','.env') : path.resolve(process.cwd(), '.env');
+        const dotEnvPath = fs.existsSync(path.resolve(process.cwd(), '..','.env')) ? path.resolve(process.cwd(), '..','.env') : path.resolve(process.cwd(), '.env');
 
         dotenv.config({
             'path' : dotEnvPath
         });
     }
 
-    public get(name: string, def: string = '') : string {
+    public get(name: string, def = '') : string {
         return process.env[name] ?? def;
     }
 }

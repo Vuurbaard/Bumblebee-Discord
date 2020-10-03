@@ -8,9 +8,9 @@ import { StateManager } from "../state-manager";
 
 @injectable()
 export class Disconnect extends Command {
-    public name: string = 'disconnect';
-    public description: string = '';
-    public signature: string = '';
+    public name = 'disconnect';
+    public description = '';
+    public signature = '';
     private bumblebee: Bumblebee;
     private client: Discord.Client;
     private log: Log;
@@ -23,8 +23,8 @@ export class Disconnect extends Command {
     }
 
     public execute(args: CommandArguments, message: Discord.Message) : void {
-        let stateManager = container.resolve(StateManager);
-        let guildState = stateManager.getByMessage(message);
+        const stateManager = container.resolve(StateManager);
+        const guildState = stateManager.getByMessage(message);
         this.log.info('Disconnect requested by', guildState?.getGuildId());
         if(guildState && guildState.isConnected()){
             message.reply('👋 Disconnecting as requested');
@@ -34,5 +34,5 @@ export class Disconnect extends Command {
             this.log.warn('Could not disconnect from voicechannel as we are not connected to any', guildState?.getGuildId());
             message.reply('❗ Cannot disconnect as i\'m not connected to any voice channel');
         }
-    };
+    }
 }

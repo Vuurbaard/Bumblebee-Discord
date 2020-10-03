@@ -8,9 +8,9 @@ import { StateManager } from "../state-manager";
 
 @injectable()
 export class TTS extends Command {
-    public name: string = 'tts';
-    public description: string = '';
-    public signature: string = '';
+    public name = 'tts';
+    public description = '';
+    public signature = '';
     private bumblebee: Bumblebee;
     private log : Log
 
@@ -21,9 +21,9 @@ export class TTS extends Command {
     }
 
     public execute(args: CommandArguments, message: Discord.Message) : void {
-        let text = args.arguments().join(' ').trim();
-        let stateManager = container.resolve(StateManager);
-        let guildState = stateManager.getByMessage(message);
+        const text = args.arguments().join(' ').trim();
+        const stateManager = container.resolve(StateManager);
+        const guildState = stateManager.getByMessage(message);
         
         if(text.length > 0 ){
             this.log.info('Retrieving tts for', text, ' for guild ', guildState?.getGuildId() );
@@ -35,8 +35,8 @@ export class TTS extends Command {
                         const missingWords = data.getMissingWords();
                         const delimit = ', ';
 
-                        let str = missingWords.join(delimit);
-                        let lastC = str.lastIndexOf(delimit);
+                        const str = missingWords.join(delimit);
+                        const lastC = str.lastIndexOf(delimit);
 
                         message.reply('Missing words: ' +  str.substring(0, lastC) + ' and ' + str.substring(lastC + delimit.length, str.length));
                     }
@@ -52,5 +52,5 @@ export class TTS extends Command {
                 }
             })
         }      
-    };
+    }
 }

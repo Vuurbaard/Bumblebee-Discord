@@ -3,8 +3,8 @@ import { Log } from "../../app/log";
 
 export default class Queue {
     private jobs: Array<Function> = [];
-    private running: boolean = false;
-    private stackSize: number = 25;
+    private running = false;
+    private stackSize = 25;
 
     constructor(){
         setInterval(this.run, 1000);
@@ -20,11 +20,11 @@ export default class Queue {
     }
 
     public run() {
-        let log = container.resolve(Log);
+        const log = container.resolve(Log);
         if(!this.running && Array.isArray(this.jobs) && this.jobs.length > 0){
             log.info("Running queue with:", this.jobs.length, "in queue");
             this.running = true;
-            let task = this.jobs.shift();
+            const task = this.jobs.shift();
             if(task) {
                 try{
                     task(this);

@@ -8,9 +8,9 @@ import { StateManager } from "../state-manager";
 
 @injectable()
 export class Skip extends Command {
-    public name: string = 'skip';
-    public description: string = '';
-    public signature: string = '';
+    public name = 'skip';
+    public description = '';
+    public signature = '';
     private bumblebee: Bumblebee;
     private client: Discord.Client;
 
@@ -21,11 +21,11 @@ export class Skip extends Command {
     }
 
     public execute(args: CommandArguments, message: Discord.Message) : void {
-        let stateManager = container.resolve(StateManager);
-        let guildState = stateManager.getByMessage(message);
+        const stateManager = container.resolve(StateManager);
+        const guildState = stateManager.getByMessage(message);
 
         if(guildState && guildState.isConnected()){
             guildState.skipItem();
         }
-    };
+    }
 }

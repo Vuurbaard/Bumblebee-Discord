@@ -71,7 +71,7 @@ export class DiscordHandler implements Bootable {
             return;
         }
 
-        let parser = new Parser(this.env.get('DISCORD_COMMAND_PREFIX'), msg.content);
+        const parser = new Parser(this.env.get('DISCORD_COMMAND_PREFIX'), msg.content);
 
         // Check if we don't have a command on our hands
         let command = this.findCommand(parser.getCommandName());
@@ -86,31 +86,6 @@ export class DiscordHandler implements Bootable {
             this.log.debug('Found command', command.name, 'to execute');
             this.runCommand(command, parser, msg);
         }
-
-       
-
-        // if(command){
-        //     this.runCommand(command, msg);
-        // } else {
-        //     // Force -tts if bumblebee otherwise don't do anything
-        //     if( 
-        //         msg.channel instanceof Discord.TextChannel && msg.channel.name.indexOf("bumblebee") >= 0 ){
-        //         msg.content = this.env.get('DISCORD_COMMAND_PREFIX') + 'tts ' + msg.content;
-        //     }
-        // }
-           
-
-        // // Force tts when using bumblebee channel
-        // if( 
-        //     msg.channel instanceof Discord.TextChannel && msg.channel.name.indexOf("bumblebee") >= 0 ){
-        //     msg.content = this.env.get('DISCORD_COMMAND_PREFIX') + 'tts ' + msg.content;
-        // }
-        
-        // let command = this.parseCommand(msg);
-
-        // if(command){
-        //     command();
-        // }
     }
 
     findCommand(commandName: string): Command | null{
@@ -120,74 +95,10 @@ export class DiscordHandler implements Bootable {
     }
 
 
-
-    // Return Closure to run command if any found
-    // parseCommand(msg : Discord.Message) : Command | null {
-    //     let prefix = this.env.get('DISCORD_COMMAND_PREFIX');
-    //     let content = msg.content;
-
-    //     // Check if we match prefix
-    //     if(content.length > prefix.length && content.slice(0,prefix.length) === prefix){
-    //         // First parse content to figure out what we are doing
-    //         let str = content.substr(prefix.length, content.length - prefix.length).trim().replace(/ +(?= )/g,'');
-    //         let parsed = str.split(' ');
-
-    //         if(parsed.length > 0) {
-    //             let commandName = parsed.shift();
-    //             let target = null as Command | null;
-                
-    //             // Check our array if we have any items matching the name
-    //             let matching = this.commands.filter((command: Command) => {
-    //                 return command.name === commandName;
-    //             });
-
-    //             if(matching.length > 0) {
-    //                 target = matching[0];
-    //             }
-                                
-    //             if(target != null) {
-    //                 this.log.debug('Found command ' + target.name);
-    //                 // Parse any arguments into the signature of the command
-    //                 let signature = target.getSignature();
-    //                 let reg = /\{([A-z0-9_\-]+)\}/g;
-    //                 let matches = signature.match(reg)?.map((item) => {
-    //                     return item.replace('{', '').replace('}','');
-    //                 });
-
-    //                 // Transform to map now
-    //                 let mappedArgs = new Map<string,string>();
-    //                 mappedArgs.set('rawCommand', content);
-    //                 mappedArgs.set('rawArguments', parsed.join(' '));
-                    
-    //                 if(matches !== undefined) {
-    //                     for (let index = 0; index < matches.length; index++) {
-    //                         const element = matches[index];
-    //                         if(parsed[index] != null){
-    //                             mappedArgs.set(element, parsed[index]);
-    //                         }
-    //                     }
-    //                 }
-
-    //                 return () => {
-    //                     let guildState = this.stagemanager.getByMessage(msg);
-    //                     if(guildState){
-    //                         this.log.debug('Executing command ' + target?.name);
-    //                         target?.execute(msg, mappedArgs, guildState);
-    //                     }
-    //                 };
-    //             }
-    //         }
-    //     }
-
-
-
-    //     return null;
-    // }
-
     runCommand(command: Command, parser: Parser, message: Discord.Message){
         
         // Get arguments from parser
-        let args = parser.parseArguments(command);
+        const args = parser.parseArguments(command);
         command.execute(args, message);
     }
 

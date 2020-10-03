@@ -18,9 +18,9 @@ export class CommandArguments {
     private parse(signature: string): Array<string> {
         let rc = new Array<string>();
 
-        let parser = /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^\/\\]*(?:\\[\S\s][^\/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g
+        const parser = /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^\/\\]*(?:\\[\S\s][^\/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g
         
-        let matched = this.rawArgs.match(parser);
+        const matched = this.rawArgs.match(parser);
 
         if(matched && matched.length > 0){
             rc = matched.map(function(item: string) {
