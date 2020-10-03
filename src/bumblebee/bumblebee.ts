@@ -2,6 +2,7 @@ import { inject, singleton } from "tsyringe";
 import { Environment } from "../app/environment";
 import * as request from "request-promise-native";
 import * as temp from 'temp';
+import { TTSResponse } from "./tts-response";
 
 @singleton()
 export class Bumblebee {
@@ -14,7 +15,7 @@ export class Bumblebee {
         this.host = env.get('API_HOST', 'https://api.bmbl.cloud');
     }
 
-    public async tts(message: string){
+    public async tts(message: string): Promise<TTSResponse | null>{
         const options = {
             url: this.host + '/v1/tts?format=opus',
             body: { "text" : message },
@@ -31,9 +32,18 @@ export class Bumblebee {
                 fullfill()
             }));
 
-            return file.path as string;
+            let missingWords = data['fragments'].filter(function(item: any){
+                return item && (item._id == undefined || item._id == null);
+            })
+
+            missingWords = missingWords.map(function(item: any){
+                return (item.text !== undefined && item.text !== null) ? item.text : '';
+            });
+
+
+            return new TTSResponse(file.path as string, missingWords);
         }
 
-        return '';
+        return null;
     }
 }

@@ -27,11 +27,11 @@
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "@types/node": "^14.10.1",
+    "@types/node": "^14.11.2",
     "@types/request": "^2.48.5",
     "@types/request-promise-native": "^1.0.17",
     "@types/temp": "^0.8.34",
-    "@types/ws": "^7.2.6"
+    "@types/ws": "^7.2.7",
   },
   "nodemonConfig": {
     "ignore": [

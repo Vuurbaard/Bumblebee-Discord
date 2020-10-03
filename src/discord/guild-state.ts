@@ -1,10 +1,9 @@
 
-import { BroadcastDispatcher, Guild, VoiceChannel, VoiceConnection } from 'discord.js';
-import { Readable, Stream, Writable } from 'stream';
+import { Guild, VoiceChannel, VoiceConnection } from 'discord.js';
 import { container } from 'tsyringe';
 import { Log } from '../app/log';
 import Queue from './queue/queue';
-import * as fs from 'fs';
+
 
 export class GuildState {
     private guild: Guild;
@@ -21,6 +20,14 @@ export class GuildState {
 
     public getGuildId() {
         return this.guild.id;
+    }
+
+    public skipItem(){
+        if(this.voiceQueue.size() > 0){
+            if(this.connection && this.voiceChannel){
+                this.connection.dispatcher.end();
+            }
+        }
     }
 
     public addToVoiceQueue(file: string) {
@@ -89,22 +96,28 @@ export class GuildState {
         
         let _vm = this;
         this.timer = setTimeout( function() {
-            console.log("Maybe i should leave")
-            if(_vm.voiceChannel){
-                console.log("lets leave");
-                _vm.voiceChannel.leave();
-                delete _vm.voiceChannel;
-            }
-
-            if(_vm.connection){
-                _vm.connection.disconnect();
-                delete _vm.connection;
-            }
+            _vm.disconnect();
         }, 300000);
     }
 
     public setVoiceChannel(channel: VoiceChannel){
         this.voiceChannel = channel;
+    }
+
+    public isConnected(){
+        return this.connection && this.voiceChannel;
+    }
+
+    public disconnect() {
+        if(this.voiceChannel){
+            this.voiceChannel.leave();
+            delete this.voiceChannel;
+        }
+
+        if(this.connection){
+            this.connection.disconnect();
+            delete this.connection;
+        }
     }
 
 }
