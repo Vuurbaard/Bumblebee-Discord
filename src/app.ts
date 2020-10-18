@@ -1,5 +1,5 @@
 import { Bootable } from "./app/bootable";
-
+import "reflect-metadata";
 import {container, InjectionToken} from "tsyringe";
 import { Environment } from "./app/environment";
 import { DiscordHandler } from "./discord/handler";

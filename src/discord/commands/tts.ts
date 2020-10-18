@@ -5,6 +5,7 @@ import { Bumblebee } from "../../bumblebee/bumblebee";
 import { Log } from "../../app/log";
 import { CommandArguments } from "./commandArguments";
 import { StateManager } from "../state-manager";
+import * as _ from 'lodash';  
 
 @injectable()
 export class TTS extends Command {
@@ -28,17 +29,15 @@ export class TTS extends Command {
         if(text.length > 0 ){
             this.log.info('Retrieving tts for', text, ' for guild ', guildState?.getGuildId() );
             this.bumblebee.tts(text).then((data) => {
+                let missingWords = text.split(' ');
                 
                 if(data){
                     this.log.debug('TTS response received with file', data.getFile());
                     if(data.hasMissingWords()){
-                        const missingWords = data.getMissingWords();
-                        const delimit = ', ';
+                        missingWords = data.getMissingWords();
 
-                        const str = missingWords.join(delimit);
-                        const lastC = str.lastIndexOf(delimit);
+                        message.reply(this.formatMissingWords(missingWords));
 
-                        message.reply('Missing words: ' +  str.substring(0, lastC) + ' and ' + str.substring(lastC + delimit.length, str.length));
                     }
 
 
@@ -49,8 +48,32 @@ export class TTS extends Command {
                     }
                 } else {
                     this.log.debug('TTS response failed');
+                    console.log(missingWords);
+                    message.reply(this.formatMissingWords(missingWords));
                 }
             })
         }      
+    }
+
+    private formatMissingWords(words: Array<string>){
+        const delimit = ', ';
+        const uniqueWords = _.uniq(words).map((word) => {
+            return `\`${word}\``;
+        });
+        const str = uniqueWords.join(delimit);
+        const lastC = str.lastIndexOf(delimit);
+
+        let reply = '';
+
+        if(uniqueWords.length == 1){
+            reply = `**Missing word:** ${str}`;
+        }
+
+        if(uniqueWords.length > 1){
+            reply = `**Missing words:** ${str.substring(0, lastC)} and ${str.substring(lastC + delimit.length, str.length).trim()}`;
+        }
+    
+        
+        return reply;
     }
 }
