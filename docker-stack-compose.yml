@@ -8,10 +8,7 @@ services:
             - LOG_INFO=info
         deploy:
             restart_policy:
-                condition: any
-                delay: 15s
-                max_attempts: 60
-                window: 30s
+                delay: 30s
             replicas: 1
             update_config:
                 parallelism: 2
