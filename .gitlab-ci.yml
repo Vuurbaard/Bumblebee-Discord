@@ -6,8 +6,8 @@ stages:
  - deploy
 
 variables:
-  DOCKER_DIND_IMAGE: "docker:19.03.12-dind"
-  DOCKER_IMAGE: "docker:19.03.12"
+  DOCKER_DIND_IMAGE: "docker:20.10.3-dind"
+  DOCKER_IMAGE: "docker:20.10.3"
 
 build master:
   image: ${DOCKER_IMAGE}
