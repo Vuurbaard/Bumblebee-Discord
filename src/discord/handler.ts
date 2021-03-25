@@ -62,6 +62,20 @@ export class DiscordHandler implements Bootable {
         this.log.info(`To allow this bot onto your server, go to the following url:`);
         this.log.info(`https://discordapp.com/api/oauth2/authorize?client_id=${this.client.user?.id}&scope=bot&permissions=103890496`);
         this.log.info(`into Discord as ${this.client.user?.tag}`);
+        
+        // 'bmbl.cloud',
+        // {
+        //     type: 'PLAYING',
+        //     url: 'https://bmbl.cloud'
+        // }
+        this.client.user?.setPresence({
+            'status': 'online',
+            'activity': {
+                'name': 'bmbl.cloud',
+                'url': 'https://bmbl.cloud',
+                'type': 'LISTENING'
+            },
+        })
     }
 
     onMessage(msg : Discord.Message) {
