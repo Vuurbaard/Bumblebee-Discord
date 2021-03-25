@@ -84,6 +84,7 @@ export class DiscordHandler implements Bootable {
 
         if(command){
             this.log.debug('Found command', command.name, 'to execute');
+            this.log.debug('Given message', msg.content);
             this.runCommand(command, parser, msg);
         }
     }

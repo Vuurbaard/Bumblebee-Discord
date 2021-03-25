@@ -28,61 +28,68 @@ export class GuildState {
         }
     }
 
-    public addToVoiceQueue(file: string) {
+    public async addToVoiceQueue(file: string) {
         const log = container.resolve(Log);
 
-        this.voiceQueue.push(async (queue: Queue) => {
+        await this.voiceQueue.push(async (queue: Queue) => {
             if(this.voiceChannel){
                 this.clearCounter();
 
                 if(!this.connection || (this.connection && this.connection.channel.id != this.voiceChannel.id)){
-                    this.connection = await this.voiceChannel.join();
-                }              
-
-                if(this.connection.dispatcher){
-                    this.connection.dispatcher.end();    
-                }
-
-                const _vm = this;
-
-                try{
-
-                    const dispatcher = this.connection.play(file, {
-                        'bitrate': 'auto',
-                        'highWaterMark': 16
-                    });
+                    try{
+                        this.connection = await this.voiceChannel.join();
+                    } catch (e) {
+                        log.error('Unable to process TTS file', e);
+                    }
+                }    
                 
+                if(this.connection){
+                    if(this.connection.dispatcher){
+                        this.connection.dispatcher.end();    
+                    }
+
                     const _vm = this;
-                    dispatcher.on('start', function () {
-                        if(_vm.connection){
-                            const player = _vm.connection.player as any;
-                            player.streamingData.pausedTime = 0;
-                        }
-                    });
+        
+                    try{
+    
+                        const dispatcher = this.connection.play(file, {
+                            'bitrate': 'auto',
+                            'highWaterMark': 16
+                        });
                     
-                    dispatcher.on('finish', function () {
-                        _vm.setCounter();
+                        const _vm = this;
+                        dispatcher.on('start', function () {
+                            if(_vm.connection){
+                                const player = _vm.connection.player as any;
+                                player.streamingData.pausedTime = 0;
+                            }
+                        });
+                        
+                        dispatcher.on('finish', function () {
+                            _vm.setCounter();
+                            queue.finish();
+                        });
+        
+                        dispatcher.on('error', function (reason) {
+                            _vm.setCounter();
+                            queue.finish();
+                        });
+        
+                        dispatcher.on('debug', function (info) {
+                            console.debug(info)
+                        });
+                    }catch(e){
+                        console.error(e);
+                        log.error(e);
                         queue.finish();
-                    });
-    
-                    dispatcher.on('error', function (reason) {
-                        _vm.setCounter();
-                        queue.finish();
-                    });
-    
-                    dispatcher.on('debug', function (info) {
-                        console.debug(info)
-                    });
-                }catch(e){
-                    console.error(e);
-                    log.error(e);
-                    queue.finish();
-                }
- 
+                    }
+                } 
             }
         });
 
         this.voiceQueue.run();
+
+        // return status;
     }
 
     private clearCounter() {

@@ -33,6 +33,10 @@ export default class Queue {
                     this.running = false;
                 }
             }
+        } else {
+            if(Array.isArray(this.jobs) && this.jobs.length == 0){
+
+            }
         }
     }
 

@@ -3,6 +3,9 @@ import { Environment } from "../app/environment";
 import * as request from "request-promise-native";
 import * as temp from 'temp';
 import { TTSResponse } from "./tts-response";
+import { container, injectable } from "tsyringe";
+import { Log } from "../app/log";
+
 
 @singleton()
 export class Bumblebee {
@@ -16,6 +19,10 @@ export class Bumblebee {
     }
 
     public async tts(message: string): Promise<TTSResponse | null>{
+        const log = container.resolve(Log);
+        const start = process.hrtime();
+
+        let response = null;
         const options = {
             url: this.host + '/v1/tts?format=opus',
             body: { "text" : message },
@@ -24,12 +31,14 @@ export class Bumblebee {
         };
 
         const data = await request.post(options);
+        
         if(data && data.file){
             const file = temp.createWriteStream({ suffix: '.opus' });
             const stream = request.get(this.host + data.file).pipe(file);
 
             await new Promise(fullfill => stream.on('finish', () => {
-                fullfill()
+                fullfill(null);
+                return true; 
             }));
 
             let missingWords = data['fragments'].filter(function(item: any){
@@ -40,10 +49,12 @@ export class Bumblebee {
                 return (item.text !== undefined && item.text !== null) ? item.text : '';
             });
 
-
-            return new TTSResponse(file.path as string, missingWords);
+            response = new TTSResponse(file.path as string, missingWords);
         }
 
-        return null;
+        const elapsed = process.hrtime(start);
+        log.debug("Call took", elapsed[0], "s", "and", elapsed[1] / 1000000, 'ms')
+
+        return response;
     }
 }

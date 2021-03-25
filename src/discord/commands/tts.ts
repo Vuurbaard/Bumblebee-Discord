@@ -28,11 +28,14 @@ export class TTS extends Command {
         
         if(text.length > 0 ){
             this.log.info('Retrieving tts for', text, ' for guild ', guildState?.getGuildId() );
+            
+
             this.bumblebee.tts(text).then((data) => {
                 let missingWords = text.split(' ');
                 
                 if(data){
                     this.log.debug('TTS response received with file', data.getFile());
+                    
                     if(data.hasMissingWords()){
                         missingWords = data.getMissingWords();
 
@@ -40,15 +43,20 @@ export class TTS extends Command {
 
                     }
 
-
                     if(guildState && message.member && message.member.voice && message.member.voice.channel){
-                        this.log.info('💬 TTS to ', message.member.voice.channel.name );
-                        guildState.setVoiceChannel(message.member.voice.channel);
-                        guildState.addToVoiceQueue(data.getFile());
+                        const channel = message.member.voice.channel;
+
+                        if(channel.joinable){
+                            this.log.info('💬 TTS to', message.member.voice.channel.name );
+                            guildState.setVoiceChannel(message.member.voice.channel);
+                            guildState.addToVoiceQueue(data.getFile());
+                        } else {
+                            message.reply('I cannot join the voice channel ' + message.member.voice.channel.name + ' because I don\'t have the privileges to join it.');
+                        }
+
                     }
                 } else {
                     this.log.debug('TTS response failed');
-                    console.log(missingWords);
                     message.reply(this.formatMissingWords(missingWords));
                 }
             })
