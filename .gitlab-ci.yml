@@ -19,16 +19,27 @@ stages:
 build image:
   extends: .buildImage
   variables:
-    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}
+    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:latest
     DOCKER_FILE: 'docker/Dockerfile'
   stage: build
   before_script:
     - cp $ENV_FILE .env
-    - export IMAGE_NAME=${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}
-    - echo $IMAGE_NAME
   only:
-    - master
     - tags
+
+build image production:
+  extends: .buildImage
+  variables:
+    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+    DOCKER_FILE: 'docker/Dockerfile'
+  stage: build
+  before_script:
+    - cp $ENV_FILE .env
+  only:
+    - tags
+
+
+
 
 # Push the image to Docker Swarm as service and run a rolling deploy
 deploy production:
@@ -36,7 +47,7 @@ deploy production:
   stage: deploy
   variables:
     IMAGE_BASE: ${CI_REGISTRY_IMAGE}
-    IMAGE_TAG: ${CI_COMMIT_TAG:-latest}
+    IMAGE_TAG: ${CI_COMMIT_TAG}
   dependencies: []
   environment:
     name: discord-bumblebee-fm

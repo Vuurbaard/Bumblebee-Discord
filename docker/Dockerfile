@@ -18,4 +18,4 @@ else \
     apk add --no-cache --virtual .gyp python make g++ ; \
     npm install ; \
 fi
-CMD npm run start-smart
+CMD npm run start
