@@ -1,58 +1,41 @@
-image: docker:stable
+image: alpine
+
+include:
+  - project: 'idobits/ci-cd-tools'
+    ref: 'master'
+    file: 'ci-cd-tools.yml'
+
 
 stages:
  - test
  - build
  - deploy
 
-variables:
-  DOCKER_DIND_IMAGE: "docker:20.10.3-dind"
-  DOCKER_IMAGE: "docker:20.10.3"
 
-build master:
-  image: ${DOCKER_IMAGE}
-  services:
-    - ${DOCKER_DIND_IMAGE}
+build image:
+  extends: .build_job
+  variables:
+    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:=latest}
+    DOCKER_FILE: 'docker/Dockerfile'
   stage: build
-  script:
-    # install composer and get dependencies
+  before_script:
     - cp $ENV_FILE .env
-    - docker build -t ${CI_REGISTRY_IMAGE}:latest --build-arg BUILD_PROD=true -f docker/Dockerfile ./
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push ${CI_REGISTRY_IMAGE}:latest
+    - echo $IMAGE_NAME
+    - echo $CI_COMMIT_TAG
+    - echo ${CI_COMMIT_TAG:=latest}
   only:
     - master
-
-build production image:
-  image: ${DOCKER_IMAGE}
-  services:
-    - ${DOCKER_DIND_IMAGE}
-  stage: build
-  variables:
-    IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
-  script:
-    # install composer and get dependencies
-    - cp $ENV_FILE .env
-    - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG} --build-arg BUILD_PROD=true -f docker/Dockerfile ./
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
-  only:
     - tags
 
 # Push the image to Docker Swarm as service and run a rolling deploy
 deploy production:
+  extends: .deploy
   stage: deploy
   variables:
-    DOCKER_HOST: ssh://$SSH_USER@$SSH_HOST
-    DISCORD_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
-  image: $DOCKER_IMAGE
-  script:
-    - apk add openssh --no-cache
-    - mkdir -p ~/.ssh/ &&  echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - eval $(ssh-agent -s)
-    - chmod 600 $SSH_KEY && ssh-add $SSH_KEY
-    - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $CI_REGISTRY
-    - docker stack deploy --prune --with-registry-auth --compose-file=docker-stack-compose.yml ${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+    PROJECT_NAMESPACE: "${CI_PROJECT_NAMESPACE}"
+    PROJECT_NAME: "gdg"
+    IMAGE_BASE: ${CI_REGISTRY_IMAGE}
+    IMAGE_TAG: ${CI_COMMIT_TAG:=latest}
   dependencies: []
   environment:
     name: discord-bumblebee-fm
