@@ -2,10 +2,10 @@ image: alpine
 
 include:
   - remote: 'https://mijnproject.nu/idobits/ci-cd-tools/-/raw/master/ci-cd-tools.yml'
-  - project: 'idobits/ci-cd-tools'
-    ref: 'master'
-    file: 'ci-cd-tools.yml'
 
+variables:
+  PROJECT_NAMESPACE: "${CI_PROJECT_NAMESPACE}"
+  PROJECT_NAME: "bmbl"
 
 stages:
  - test
@@ -33,8 +33,6 @@ deploy production:
   extends: .deploy
   stage: deploy
   variables:
-    PROJECT_NAMESPACE: "${CI_PROJECT_NAMESPACE}"
-    PROJECT_NAME: "gdg"
     IMAGE_BASE: ${CI_REGISTRY_IMAGE}
     IMAGE_TAG: ${CI_COMMIT_TAG:=latest}
   dependencies: []
