@@ -1,11 +1,14 @@
 image: alpine
 
-include:
-  - remote: 'https://mijnproject.nu/idobits/ci-cd-tools/-/raw/master/ci-cd-tools.yml'
-
 variables:
   PROJECT_NAMESPACE: "${CI_PROJECT_NAMESPACE}"
   PROJECT_NAME: "bmbl"
+
+
+include:
+  - project: 'idobits/ci-cd-tools'
+    ref: 'master'
+    file: 'ci-cd-tools.yml'
 
 stages:
  - test
@@ -14,9 +17,9 @@ stages:
 
 
 build image:
-  extends: .build_job
+  extends: .buildImage
   variables:
-    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:=latest}
+    IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:=latest}"
     DOCKER_FILE: 'docker/Dockerfile'
   stage: build
   before_script:
