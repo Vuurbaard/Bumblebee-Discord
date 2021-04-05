@@ -2,7 +2,7 @@ image: alpine
 
 variables:
   PROJECT_NAMESPACE: "${CI_PROJECT_NAMESPACE}"
-  PROJECT_NAME: "bmbl"
+  PROJECT_NAME: "discord"
 
 
 include:
