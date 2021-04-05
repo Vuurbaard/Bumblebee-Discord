@@ -32,14 +32,12 @@ build image production:
   variables:
     IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
     DOCKER_FILE: 'docker/Dockerfile'
+    DOCKER_BUILD_ARGS: "--build-arg BUILD_PROD=true"
   stage: build
   before_script:
     - cp $ENV_FILE .env
   only:
     - tags
-
-
-
 
 # Push the image to Docker Swarm as service and run a rolling deploy
 deploy production:
