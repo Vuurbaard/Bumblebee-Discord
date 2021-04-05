@@ -19,14 +19,13 @@ stages:
 build image:
   extends: .buildImage
   variables:
-    IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}"
+    IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}
     DOCKER_FILE: 'docker/Dockerfile'
   stage: build
   before_script:
     - cp $ENV_FILE .env
+    - export IMAGE_NAME=${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}
     - echo $IMAGE_NAME
-    - echo $CI_COMMIT_TAG
-    - echo ${CI_COMMIT_TAG:=latest}
   only:
     - master
     - tags
