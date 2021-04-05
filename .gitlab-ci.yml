@@ -1,6 +1,7 @@
 image: alpine
 
 include:
+  - remote: 'https://mijnproject.nu/idobits/ci-cd-tools/-/raw/master/ci-cd-tools.yml'
   - project: 'idobits/ci-cd-tools'
     ref: 'master'
     file: 'ci-cd-tools.yml'
