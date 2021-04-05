@@ -19,7 +19,7 @@ stages:
 build image:
   extends: .buildImage
   variables:
-    IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:=latest}"
+    IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-latest}"
     DOCKER_FILE: 'docker/Dockerfile'
   stage: build
   before_script:
@@ -37,7 +37,7 @@ deploy production:
   stage: deploy
   variables:
     IMAGE_BASE: ${CI_REGISTRY_IMAGE}
-    IMAGE_TAG: ${CI_COMMIT_TAG:=latest}
+    IMAGE_TAG: ${CI_COMMIT_TAG:-latest}
   dependencies: []
   environment:
     name: discord-bumblebee-fm
