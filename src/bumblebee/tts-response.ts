@@ -1,9 +1,11 @@
+import MemoryStream from "memorystream";
+
 export class TTSResponse {
-    private file: string;
+    private stream: MemoryStream;
     private missingWords: Array<string>
 
-    constructor(file: string, missingWords: Array<string>){
-        this.file = file;
+    constructor(stream: MemoryStream, missingWords: Array<string>){
+        this.stream = stream;
         this.missingWords = missingWords;
     }
 
@@ -16,8 +18,8 @@ export class TTSResponse {
         return this.missingWords;
     }
 
-    public getFile(): string {
-        return this.file;
+    public getStream(): MemoryStream {
+        return this.stream;
     }
     
 }

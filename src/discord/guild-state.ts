@@ -1,5 +1,6 @@
 
 import { Guild, VoiceChannel, VoiceConnection } from 'discord.js';
+import MemoryStream from 'memorystream';
 import { container } from 'tsyringe';
 import { Log } from '../app/log';
 import Queue from './queue/queue';
@@ -28,7 +29,7 @@ export class GuildState {
         }
     }
 
-    public async addToVoiceQueue(file: string) {
+    public async addToVoiceQueue(file: string|MemoryStream) {
         const log = container.resolve(Log);
 
         await this.voiceQueue.push(async (queue: Queue) => {

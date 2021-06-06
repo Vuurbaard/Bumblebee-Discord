@@ -34,7 +34,7 @@ export class TTS extends Command {
                 let missingWords = text.split(' ');
                 
                 if(data){
-                    this.log.debug('TTS response received with file', data.getFile());
+                    this.log.debug('TTS response received as stream');
                     
                     if(data.hasMissingWords()){
                         missingWords = data.getMissingWords();
@@ -49,7 +49,7 @@ export class TTS extends Command {
                         if(channel.joinable){
                             this.log.info('💬 TTS to', message.member.voice.channel.name );
                             guildState.setVoiceChannel(message.member.voice.channel);
-                            guildState.addToVoiceQueue(data.getFile());
+                            guildState.addToVoiceQueue(data.getStream());
                         } else {
                             message.reply('I cannot join the voice channel ' + message.member.voice.channel.name + ' because I don\'t have the privileges to join it.');
                         }

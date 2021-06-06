@@ -1,10 +1,10 @@
 import { inject, singleton } from "tsyringe";
 import { Environment } from "../app/environment";
 import * as request from "request-promise-native";
-import * as temp from 'temp';
 import { TTSResponse } from "./tts-response";
 import { container, injectable } from "tsyringe";
 import { Log } from "../app/log";
+import MemoryStream from 'memorystream';
 
 
 @singleton()
@@ -31,10 +31,9 @@ export class Bumblebee {
         };
 
         const data = await request.post(options);
-        
-        if(data && data.file){
-            const file = temp.createWriteStream({ suffix: '.opus' });
-            const stream = request.get(this.host + data.file).pipe(file);
+        if(data && data.file){           
+            const inMemoryStream = new MemoryStream();
+            const stream = request.get(this.host + data.file).pipe(inMemoryStream);
 
             await new Promise(fullfill => stream.on('finish', () => {
                 fullfill(null);
@@ -49,7 +48,7 @@ export class Bumblebee {
                 return (item.text !== undefined && item.text !== null) ? item.text : '';
             });
 
-            response = new TTSResponse(file.path as string, missingWords);
+            response = new TTSResponse(inMemoryStream, missingWords);
         }
 
         const elapsed = process.hrtime(start);
