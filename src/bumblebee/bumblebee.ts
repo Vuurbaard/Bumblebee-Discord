@@ -37,36 +37,26 @@ export class Bumblebee {
             console.warn("Oopsie?");
         }
         
-
         if(data && data.file){           
             const inMemoryStream = new MemoryStream();
-            let stream: MemoryStream|null = null;
 
-            try {
-                stream = request.get(this.host + data.file).on('error', (e) => {
-                    log.error("Failed to stream data to Discord", e);
-                    stream = null;
-                }).pipe(inMemoryStream);
-            }catch (e) {
-                log.error("I was unable to retrieve the file due to a request error", e);
-            }
+            const stream = request.get(this.host + data.file).pipe(inMemoryStream);
 
-            if(stream && stream instanceof MemoryStream){
-                await new Promise(fullfill => stream?.on('finish', () => {
-                    fullfill(null);
-                    return true; 
-                }));
-    
-                let missingWords = data['fragments'].filter(function(item: any){
-                    return item && (item._id == undefined || item._id == null);
-                })
-    
-                missingWords = missingWords.map(function(item: any){
-                    return (item.text !== undefined && item.text !== null) ? item.text : '';
-                });
-    
-                response = new TTSResponse(inMemoryStream, missingWords);
-            }
+            await new Promise(fullfill => stream.on('finish', () => {
+                fullfill(null);
+                return true; 
+            }));
+
+
+            let missingWords = data['fragments'].filter(function(item: any){
+                return item && (item._id == undefined || item._id == null);
+            })
+        
+            missingWords = missingWords.map(function(item: any){
+                return (item.text !== undefined && item.text !== null) ? item.text : '';
+            });
+        
+            response = new TTSResponse(inMemoryStream, missingWords);
 
         }
 
