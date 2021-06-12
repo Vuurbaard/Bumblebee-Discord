@@ -1,6 +1,5 @@
 import { GuildState } from "../guild-state";
 
 export interface Queuable {
-
-    run(guildState: GuildState): boolean;
+  run(guildState: GuildState): boolean;
 }

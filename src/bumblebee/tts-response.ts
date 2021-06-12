@@ -1,25 +1,23 @@
 import MemoryStream from "memorystream";
 
 export class TTSResponse {
-    private stream: MemoryStream;
-    private missingWords: Array<string>
+  private stream: MemoryStream;
+  private missingWords: Array<string>;
 
-    constructor(stream: MemoryStream, missingWords: Array<string>){
-        this.stream = stream;
-        this.missingWords = missingWords;
-    }
+  constructor(stream: MemoryStream, missingWords: Array<string>) {
+    this.stream = stream;
+    this.missingWords = missingWords;
+  }
 
-    hasMissingWords(): boolean {
-        return this.missingWords.length > 0;
-    }
+  hasMissingWords(): boolean {
+    return this.missingWords.length > 0;
+  }
 
-    
-    public getMissingWords(): Array<string> {
-        return this.missingWords;
-    }
+  public getMissingWords(): Array<string> {
+    return this.missingWords;
+  }
 
-    public getStream(): MemoryStream {
-        return this.stream;
-    }
-    
+  public getStream(): MemoryStream {
+    return this.stream;
+  }
 }

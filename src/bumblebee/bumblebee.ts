@@ -4,65 +4,63 @@ import * as request from "request-promise-native";
 import { TTSResponse } from "./tts-response";
 import { container } from "tsyringe";
 import { Log } from "../app/log";
-import MemoryStream from 'memorystream';
-
+import MemoryStream from "memorystream";
 
 @singleton()
 export class Bumblebee {
+  private token: string;
+  private host: string;
 
-    private token: string;
-    private host: string;
+  constructor(@inject(Environment) env: Environment) {
+    this.token = env.get("BUMBLEBEE_TOKEN");
+    this.host = env.get("API_HOST", "https://api.bmbl.cloud");
+  }
 
-    constructor(@inject(Environment) env: Environment){
-        this.token = env.get('BUMBLEBEE_TOKEN');
-        this.host = env.get('API_HOST', 'https://api.bmbl.cloud');
+  public async tts(message: string): Promise<TTSResponse | null> {
+    const log = container.resolve(Log);
+    const start = process.hrtime();
+
+    let response = null;
+    const options = {
+      url: this.host + "/v1/tts?format=opus",
+      body: { text: message },
+      json: true,
+      headers: { Authorization: this.token },
+    };
+    let data = null;
+
+    try {
+      data = await request.post(options);
+    } catch (e) {
+      console.warn("Oopsie?");
     }
 
-    public async tts(message: string): Promise<TTSResponse | null>{
-        const log = container.resolve(Log);
-        const start = process.hrtime();
+    if (data && data.file) {
+      const inMemoryStream = new MemoryStream();
 
-        let response = null;
-        const options = {
-            url: this.host + '/v1/tts?format=opus',
-            body: { "text" : message },
-            json: true,
-            headers: { 'Authorization': this.token }
-        };
-        let data = null;
+      const stream = request.get(this.host + data.file).pipe(inMemoryStream);
 
-        try {
-            data =  await request.post(options);
-        } catch (e){
-            console.warn("Oopsie?");
-        }
-        
-        if(data && data.file){           
-            const inMemoryStream = new MemoryStream();
+      await new Promise((fullfill) =>
+        stream.on("finish", () => {
+          fullfill(null);
+          return true;
+        })
+      );
 
-            const stream = request.get(this.host + data.file).pipe(inMemoryStream);
+      let missingWords = data["fragments"].filter(function (item: any) {
+        return item && (item._id == undefined || item._id == null);
+      });
 
-            await new Promise(fullfill => stream.on('finish', () => {
-                fullfill(null);
-                return true; 
-            }));
+      missingWords = missingWords.map(function (item: any) {
+        return item.text !== undefined && item.text !== null ? item.text : "";
+      });
 
-
-            let missingWords = data['fragments'].filter(function(item: any){
-                return item && (item._id == undefined || item._id == null);
-            })
-        
-            missingWords = missingWords.map(function(item: any){
-                return (item.text !== undefined && item.text !== null) ? item.text : '';
-            });
-        
-            response = new TTSResponse(inMemoryStream, missingWords);
-
-        }
-
-        const elapsed = process.hrtime(start);
-        log.debug("Call took", elapsed[0], "s", "and", elapsed[1] / 1000000, 'ms')
-
-        return response;
+      response = new TTSResponse(inMemoryStream, missingWords);
     }
+
+    const elapsed = process.hrtime(start);
+    log.debug("Call took", elapsed[0], "s", "and", elapsed[1] / 1000000, "ms");
+
+    return response;
+  }
 }

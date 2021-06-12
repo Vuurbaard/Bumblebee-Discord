@@ -2,41 +2,48 @@ import { Command } from "./command";
 import { CommandArguments } from "./commandArguments";
 
 export class Parser {
+  private input: string;
+  private prefix: string;
 
-    private input: string;
-    private prefix: string;
+  constructor(prefix: string, input: string) {
+    this.input = input;
+    this.prefix = prefix;
+  }
 
-    constructor(prefix: string, input: string){
-        this.input = input;
-        this.prefix = prefix;
+  public getCommandName(): string {
+    let rc = "";
+
+    if (
+      this.input.length > this.prefix.length &&
+      this.input.slice(0, this.prefix.length) === this.prefix
+    ) {
+      // First parse content to figure out what we are doing
+      const str = this.input
+        .substr(this.prefix.length, this.input.length - this.prefix.length)
+        .trim()
+        .replace(/ +(?= )/g, "");
+      const parsed = str.split(" ");
+      if (parsed.length > 0) {
+        rc = parsed.shift() as string;
+      }
     }
 
-    public getCommandName(): string{
-        let rc = '';
+    return rc;
+  }
 
-        if(this.input.length > this.prefix.length && this.input.slice(0,this.prefix.length) === this.prefix){
-            // First parse content to figure out what we are doing
-            const str = this.input.substr(this.prefix.length, this.input.length - this.prefix.length).trim().replace(/ +(?= )/g,'');
-            const parsed = str.split(' ');
-            if(parsed.length > 0){
-                rc = parsed.shift() as string;
-            }
-        }
+  public parseArguments(command: Command): CommandArguments {
+    let input = this.input;
+    const commandName = this.getCommandName();
+    const fullCommand = this.prefix + commandName;
 
-        return rc;
+    if (
+      commandName.length > 0 &&
+      input.length >= fullCommand.length &&
+      input.substring(0, fullCommand.length) == fullCommand
+    ) {
+      input = input.substring(fullCommand.length + 1, input.length);
     }
 
-    public parseArguments(command: Command): CommandArguments {
-        let input = this.input;
-        const commandName = this.getCommandName();
-        const fullCommand = this.prefix + commandName;
-
-        if(commandName.length > 0 && input.length >= fullCommand.length && input.substring(0, fullCommand.length) == fullCommand){
-            input = input.substring(fullCommand.length + 1, input.length);
-        }
-
-        return new CommandArguments(input, command.getSignature());
-    }
-
-
+    return new CommandArguments(input, command.getSignature());
+  }
 }
