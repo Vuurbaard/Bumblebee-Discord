@@ -80,8 +80,8 @@ export class GuildState {
                             console.debug(info)
                         });
                     }catch(e){
-                        console.error(e);
-                        log.error(e);
+                        // console.error(e);
+                        // log.error(e);
                         queue.finish();
                     }
                 } 

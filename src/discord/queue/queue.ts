@@ -29,7 +29,7 @@ export default class Queue {
                 try{
                     task(this);
                 } catch (e) {
-                    console.error(e);
+                    // console.error(e);
                     this.running = false;
                 }
             }

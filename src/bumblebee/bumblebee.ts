@@ -2,7 +2,7 @@ import { inject, singleton } from "tsyringe";
 import { Environment } from "../app/environment";
 import * as request from "request-promise-native";
 import { TTSResponse } from "./tts-response";
-import { container, injectable } from "tsyringe";
+import { container } from "tsyringe";
 import { Log } from "../app/log";
 import MemoryStream from 'memorystream';
 
@@ -29,26 +29,45 @@ export class Bumblebee {
             json: true,
             headers: { 'Authorization': this.token }
         };
+        let data = null;
 
-        const data = await request.post(options);
+        try {
+            data =  await request.post(options);
+        } catch (e){
+            console.warn("Oopsie?");
+        }
+        
+
         if(data && data.file){           
             const inMemoryStream = new MemoryStream();
-            const stream = request.get(this.host + data.file).pipe(inMemoryStream);
+            let stream: MemoryStream|null = null;
 
-            await new Promise(fullfill => stream.on('finish', () => {
-                fullfill(null);
-                return true; 
-            }));
+            try {
+                stream = request.get(this.host + data.file).on('error', (e) => {
+                    log.error("Failed to stream data to Discord", e);
+                    stream = null;
+                }).pipe(inMemoryStream);
+            }catch (e) {
+                log.error("I was unable to retrieve the file due to a request error", e);
+            }
 
-            let missingWords = data['fragments'].filter(function(item: any){
-                return item && (item._id == undefined || item._id == null);
-            })
+            if(stream && stream instanceof MemoryStream){
+                await new Promise(fullfill => stream?.on('finish', () => {
+                    fullfill(null);
+                    return true; 
+                }));
+    
+                let missingWords = data['fragments'].filter(function(item: any){
+                    return item && (item._id == undefined || item._id == null);
+                })
+    
+                missingWords = missingWords.map(function(item: any){
+                    return (item.text !== undefined && item.text !== null) ? item.text : '';
+                });
+    
+                response = new TTSResponse(inMemoryStream, missingWords);
+            }
 
-            missingWords = missingWords.map(function(item: any){
-                return (item.text !== undefined && item.text !== null) ? item.text : '';
-            });
-
-            response = new TTSResponse(inMemoryStream, missingWords);
         }
 
         const elapsed = process.hrtime(start);

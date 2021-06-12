@@ -57,8 +57,11 @@ export class TTS extends Command {
                     }
                 } else {
                     this.log.debug('TTS response failed');
-                    message.reply(this.formatMissingWords(missingWords));
+                    message.reply("I'm unable to generate a TTS response at this time... 😞")
+                    // message.reply(this.formatMissingWords(missingWords));
                 }
+            }).catch((reason) => {
+                console.warn("Something went wrong....", reason);
             })
         }      
     }
