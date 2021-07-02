@@ -21,7 +21,7 @@ export class GuildState {
   }
 
   public skipItem() {
-    if (this.voiceQueue.size() >= 0 && this.connection && this.voiceChannel) {
+    if (this.voiceQueue.size() >= 0 && this.connection && this.voiceChannel && this.connection.dispatcher) {
       this.connection.dispatcher.end();
     }
   }

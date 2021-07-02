@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.8'
 services:
     discord:
         build: 
@@ -13,9 +13,9 @@ services:
         environment:
             - NODE_ENV=development
         container_name: "discord"
-        # networks:
-        #   - api_bumblebee-net
+        networks:
+          - bumblebee-net
 
-# networks:
-#   api_bumblebee-net:
-#     external: true
+networks:
+    bumblebee-net:
+        external: true
