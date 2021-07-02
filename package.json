@@ -11,7 +11,7 @@
     "start": "if test \"$NODE_ENV\" = \"production\" ; then npm run start:prod ; else npm run start:dev;  fi",
     "start:dev": "nodemon -e ts --exec \"npm run compile-and-run\"",
     "start:prod": "node ./dist/server.js",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "author": "",
   "license": "ISC",

@@ -29,7 +29,7 @@ export class Disconnect extends Command {
     if (guildState && guildState.isConnected()) {
       message.reply("👋 Disconnecting as requested");
       guildState.disconnect();
-      this.log.info("Sucessfully disconnected", guildState.getGuildId());
+      this.log.info("Sucessfully disconnected from", guildState.getGuildId());
     } else {
       this.log.warn(
         "Could not disconnect from voicechannel as we are not connected to any",
